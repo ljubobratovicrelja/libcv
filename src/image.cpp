@@ -161,7 +161,7 @@ data_type image_array::dtype() const {
 }
 
 unsigned image_array::row_stride() const {
-    return this->cols() * this->channels() * this->depth();
+    return this->_strides[0];
 }
 
 unsigned image_array::depth() const {
