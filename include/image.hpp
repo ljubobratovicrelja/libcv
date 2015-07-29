@@ -54,7 +54,7 @@ enum data_type {
     INT64,
     FLOAT32,
     FLOAT64,
-#ifdef REAL_TYPE_DOUBLE
+#ifdef CV_REAL_TYPE_DOUBLE
 	REAL = FLOAT64
 #else
 	REAL = FLOAT32
@@ -93,24 +93,21 @@ data_type get_dtype() {
 }
 
 /*!
- * @brief image_array buffer class.
+ * @brief Image data buffer class.
  *
- * Holds image_array data of arbitrary format and type.
- * Designed to be used as an I/O structure.
- * For manipulation, convert to matrix of
- * corresponding type.
+ * Holds image data of arbitrary format and type.
+ *
  */
 class CV_EXPORT image_array: public basic_array <byte> {
 public:
 private:
     data_type _dtype;
 
+    //! Runtime assignment of the data type.
+    template <typename _Tp> void set_type();
 public:
     typedef basic_array<byte> super_type;
 
-    //! Runtime assignment of the data type.
-    template <typename _Tp> void set_type();
-    template <typename _Tp> data_type get_type() const;
 public:
     //! Default constructor.
     image_array();
@@ -215,6 +212,7 @@ public:
 
     //! Type trait to check the data type of the image data.
     template <typename _Tp> bool is_type() const;
+
     /*!
      * @brief Operator converter to corresponding matrix.
      *
@@ -223,12 +221,13 @@ public:
     template<typename _Tp>
     operator matrix<_Tp>() const {
         ASSERT(this->is_valid() && sizeof(_Tp) == this->depth());
+		// TODO: finish implementation...
         return matrix<_Tp>(this->rows(), this->cols(), reinterpret_cast<_Tp*>(this->_begin), this->_refcount);
     }
 
     //! Boolean operator, checking for data validity.
     operator bool() const {
-        return static_cast<bool>(this->_data);
+        return this->is_valid();
     }
 };
 

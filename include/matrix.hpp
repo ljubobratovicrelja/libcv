@@ -1,24 +1,30 @@
-//The MIT License (MIT)
+// The MIT License (MIT)
 //
-//Copyright (c) 2015 Relja Ljubobratovic, ljubobratovic.relja@gmail.com
+// Copyright (c) 2015 Relja Ljubobratovic, ljubobratovic.relja@gmail.com
 //
-//Permission is hereby granted, free of charge, to any person obtaining a copy
-//of this software and associated documentation files (the "Software"), to deal
-//in the Software without restriction, including without limitation the rights
-//to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//copies of the Software, and to permit persons to whom the Software is
-//furnished to do so, subject to the following conditions:
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 //
-//The above copyright notice and this permission notice shall be included in
-//all copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
-//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-//THE SOFTWARE.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+// Description:
+// MxN Matrix class implementation.
+//
+// Author:
+// Relja Ljubobratovic, ljubobratovic.relja@gmail.com
 
 
 #ifndef MATRIX_HPP_AEUQVFPW
@@ -36,7 +42,7 @@ namespace cv {
  */
 template<class _Tp>
 class matrix: public basic_array < _Tp > {
-public:
+  public:
 	typedef CV_TYPENAME basic_array<_Tp>::value_type value_type;
 	typedef CV_TYPENAME basic_array<_Tp>::pointer pointer;
 	typedef CV_TYPENAME basic_array<_Tp>::reference reference;
@@ -44,18 +50,18 @@ public:
 	typedef CV_TYPENAME basic_array<_Tp>::difference_type difference_type;
 	typedef CV_TYPENAME basic_array<_Tp>::size_type size_type;
 
-	typedef bidirectional_iterator<_Tp> iterator; //!< Random access iterator for continuous matrices.
-	typedef bidirectional_iterator<const _Tp> const_iterator; //!< Random access read-only iterator for continuous matrices.
+	typedef bidirectional_iterator<_Tp> iterator; //!< bidirectional iterator with respect to strides.
+	typedef bidirectional_iterator<const _Tp> const_iterator; //!< bidirectional read-only iterator with respect to strides.
 
 	typedef basic_array<_Tp> super_type; //!< Type of the superclass.
 
-protected:
+  protected:
 	//! Allocate region from another matrix.
 	void copy_roi(unsigned row, unsigned col, unsigned rows, unsigned cols, const matrix<_Tp>& source, RoiEdge edgeManage);
 	//! Reference region of data from another matrix.
 	void ref_roi(unsigned row, unsigned col, unsigned rows, unsigned cols, const matrix<_Tp>& source);
 
-public:
+  public:
 	//! Default constructor.
 	matrix();
 	//! Class constructor.
@@ -119,31 +125,25 @@ public:
 	vec2i size() const;
 
 	/*!
-	 * @brief Get row at index.
-	 *
-	 * Data is therefore reference, not a copy.
-	 * Complexity is O(1).
-	 *
-	 * @return Vector of the same type as matrix, as reference to
-	 * requested row.
-	 */
+	* @brief Get row at index.
+	*
+	* Data is reference, not a copy.
+	* Complexity is O(1).
+	*
+	*/
 	vector<_Tp> row(unsigned i);
 	/*!
-	 * @brief Get column at index.
-	 *
-	 * Data is therefore reference, not a copy.
-	 * Complexity is O(1).
-	 *
-	 * @return Vector of the same type as matrix, as reference to
-	 * requested column.
-	 */
+	* @brief Get column at index.
+	*
+	* Data is reference, not a copy.
+	* Complexity is O(1).
+	*
+	*/
 	vector<_Tp> col(unsigned i);
 
 	/*!
-	 * @brief Fill all members with given value.
-	 *
-	 * Complexity O(1).
-	 */
+	* @brief Fill all members with given value.
+	*/
 	void fill(const _Tp& value);
 	//! Check if this matrix is square.
 	bool is_square() const;
@@ -153,34 +153,14 @@ public:
 	//! Return transposed version, but do not alter this matrix data.
 	matrix<_Tp> transposed() const;
 
-	iterator begin() {
-		if (!this->_data)
-			return nullptr;
-		ASSERT(this->_strides[1]*this->cols() == this->_strides[0]);
-		return iterator(this->_begin, this->_strides[1]);
-	}
-
-	iterator end() {
-		if (!this->_data)
-			return nullptr;
-		ASSERT(this->_strides[1]*this->cols() == this->_strides[0]);
-		return iterator(this->_begin + this->_strides[0]*this->rows(), this->_strides[1]);
-	}
-
-	const_iterator begin() const {
-		if (!this->_data)
-			return nullptr;
-		ASSERT(this->_strides[1]*this->cols() == this->_strides[0]);
-		return const_iterator(this->_begin, this->_strides[1]);
-	}
-
-	const_iterator end() const {
-		if (!this->_data)
-			return nullptr;
-		ASSERT(this->_strides[1]*this->cols() == this->_strides[0]);
-		return const_iterator(this->_begin + this->_strides[0]*this->rows(), this->_strides[1]);
-	}
-
+	//! Get mutable data begin iterator.
+	iterator begin();
+	//! Get mutable data end iterator.
+	iterator end();
+	//! Get immutable data begin iterator.
+	const_iterator begin() const; 
+	//! Get immutable data begin iterator.
+	const_iterator end() const;
 	//!Swap two matrix item values.
 	void swap(unsigned i1, unsigned i2);
 	//!Swap two matrix item values.
@@ -243,7 +223,7 @@ typedef matrix<vec4f> matrix4f; //!< Four channel 32-bit float matrix
 typedef matrix<vec4s> matrix4s; //!< Four channel 16-bit short matrix
 typedef matrix<vec4b> matrix4b; //!< Four channel 8-bit byte matrix
 
-#ifdef REAL_TYPE_DOUBLE
+#ifdef CV_REAL_TYPE_DOUBLE
 typedef matrixd matrixr;
 typedef matrix2d matrix2r;
 typedef matrix3d matrix3r;
@@ -287,7 +267,7 @@ matrix<_Tp>::matrix(const std::initializer_list<std::initializer_list<_Tp> > &m)
 		for (unsigned j = 0; j < i_iter->size(); ++j, ++iter) {
 			ASSERT(i_iter->size() == c);
 			(*this)(i, j) = *iter;
-		}	
+		}
 	}
 }
 
@@ -534,6 +514,38 @@ matrix<_Tp> matrix<_Tp>::transposed() const {
 		}
 	}
 	return t;
+}
+
+template<typename _Tp>
+CV_TYPENAME matrix<_Tp>::iterator matrix<_Tp>::begin() {
+	if (!this->_data)
+		return nullptr;
+	ASSERT(this->_strides[1]*this->cols() == this->_strides[0]);
+	return iterator(this->_begin, this->_strides[1]);
+}
+
+template<typename _Tp>
+CV_TYPENAME matrix<_Tp>::iterator matrix<_Tp>::end() {
+	if (!this->_data)
+		return nullptr;
+	ASSERT(this->_strides[1]*this->cols() == this->_strides[0]);
+	return iterator(this->_begin + this->_strides[0]*this->rows(), this->_strides[1]);
+}
+
+template<typename _Tp>
+CV_TYPENAME matrix<_Tp>::const_iterator matrix<_Tp>::begin() const {
+	if (!this->_data)
+		return nullptr;
+	ASSERT(this->_strides[1]*this->cols() == this->_strides[0]);
+	return const_iterator(this->_begin, this->_strides[1]);
+}
+
+template<typename _Tp>
+CV_TYPENAME matrix<_Tp>::const_iterator matrix<_Tp>::end() const {
+	if (!this->_data)
+		return nullptr;
+	ASSERT(this->_strides[1]*this->cols() == this->_strides[0]);
+	return const_iterator(this->_begin + this->_strides[0]*this->rows(), this->_strides[1]);
 }
 
 template<typename _Tp>
@@ -876,5 +888,6 @@ matrix<_Tp> &operator%=(matrix<_Tp> &lhs, double rhs) {
 }
 
 #endif /* end of include guard: MATRIX_HPP_AEUQVFPW */
+
 
 

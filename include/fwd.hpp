@@ -31,17 +31,19 @@
 #define FWD_HPP_1F9LO7BS
 
 
-#if defined(_WIN32)
+#if defined(_MSC_VER)
 //  Microsoft Visual Compiler, and DLL compilation
 #define CV_EXPORT __declspec(dllexport)
 #define CV_IMPORT __declspec(dllimport)
 #define CV_PRAGMA(arg) __pragma(arg)
 #define CV_TYPENAME typename
+#define CV_WINDOWS
 #elif defined(__GNUG__) //  GNU Compiler
 #define CV_EXPORT __attribute__((visibility("default")))
 #define CV_PRAGMA(arg) _Pragma(#arg)
 #define CV_IMPORT
 #define CV_TYPENAME typename
+#define CV_LINUX
 #else // arbitrary compiler, not expected and handled.
 #error Unrecognized compiler
 #define CV_EXPORT
@@ -77,7 +79,7 @@ typedef unsigned char byte;
 typedef byte uchar;
 typedef unsigned int uint;
 
-#ifdef REAL_TYPE_DOUBLE
+#ifdef CV_REAL_TYPE_DOUBLE
 typedef double real_t;
 #else
 typedef float real_t;
