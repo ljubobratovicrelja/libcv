@@ -220,9 +220,14 @@ public:
      */
     template<typename _Tp>
     operator matrix<_Tp>() const {
-        ASSERT(this->is_valid() && sizeof(_Tp) == this->depth());
-		// TODO: finish implementation...
-        return matrix<_Tp>(this->rows(), this->cols(), reinterpret_cast<_Tp*>(this->_begin), this->_refcount);
+        ASSERT(this->is_valid() && sizeof(_Tp) == this->depth()*this->channels());
+		auto data = reinterpret_cast<_Tp*>(this->_data);
+		auto begin = reinterpret_cast<_Tp*>(this->_begin);
+		auto shape = this->_shape;
+		auto strides = this->_strides;
+		shape.resize(2);
+		strides.resize(2);
+        return matrix<_Tp>(data, begin, shape, strides, this->_refcount);
     }
 
     //! Boolean operator, checking for data validity.
