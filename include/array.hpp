@@ -253,8 +253,9 @@ basic_array<_Tp>::basic_array() :
 template<class _Tp>
 basic_array<_Tp>::basic_array(pointer data, pointer begin, const index_array &shape, const index_array &strides, refcount_type *refcount):
 _data(data), _begin(begin), _shape(shape), _strides(strides), _refcount(refcount) {
-	ASSERT(data && begin && refcount);
-	REF_INCREMENT(refcount);
+	ASSERT(data && begin);
+	if (refcount)
+		REF_INCREMENT(refcount);
 }
 
 template<class _Tp>
