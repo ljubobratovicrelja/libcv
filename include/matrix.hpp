@@ -77,6 +77,8 @@ class matrix: public basic_array < _Tp > {
 
 	//! Class constructor.
 	matrix(unsigned rows, unsigned cols, pointer data, refcount_type *refcounter = nullptr);
+	//! Class constructor.
+	matrix(pointer data, pointer begin, const index_array &shape, const index_array &strides, refcount_type *refcounter);
 	//! Copy constructor.
 	matrix(const matrix<_Tp> &m, bool deepCopy = false);
 	//! Move constructor.
@@ -278,12 +280,20 @@ matrix<_Tp>::matrix(vec2i size):
 
 template<typename _Tp>
 matrix<_Tp>::matrix(vec2i size, const _Tp & val):
-	super_type(size[0], size[1], val) {
+	super_type(size[0], size[1]) {
+		this->fill(val);
 }
 
 template<typename _Tp>
-matrix<_Tp>::matrix(unsigned rows, unsigned cols, pointer data, refcount_type *refcounter) : super_type(data, data, {rows, cols}, {cols, 1}, refcounter) {
+matrix<_Tp>::matrix(unsigned rows, unsigned cols, pointer data, refcount_type *refcounter) : 
+	super_type(data, data, {rows, cols}, {cols, 1}, refcounter) {
 	ASSERT(rows && cols && data);
+}
+
+template<typename _Tp>
+matrix<_Tp>::matrix(pointer data, pointer begin, const index_array &shape, const index_array &strides, refcount_type *refcount) : 
+	super_type(data, begin, shape, strides, refcount) {
+	ASSERT(data && begin && shape.size() == 2 && strides.size() == 2);
 }
 
 template<typename _Tp>
