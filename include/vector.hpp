@@ -257,16 +257,16 @@ protected:
 public:
 	//! Default constructor.
 	vectorx();
+	//! Construct using initializer list of values.
 	vectorx(const std::initializer_list<_Tp> &list);
-
 	//! Constructor using scalar value - fills vector with it.
 	vectorx(const _Tp &a);
-	//! Construct a 2D vector.
-	vectorx(const _Tp &a, const _Tp &b);
-	//! Construct a 3D vector.
-	vectorx(const _Tp &a, const _Tp &b, const _Tp &c);
-	//! Construct a 4D vector.
-	vectorx(const _Tp &a, const _Tp &b, const _Tp &c, const _Tp &d);
+	//! Vector-2 initializer. Vector needs to be previously defined as length 2.
+	vectorx(const _Tp & a, const _Tp & b);
+	//! Vector-3 initializer. Vector needs to be previously defined as length 3.
+	vectorx(const _Tp & a, const _Tp & b, const _Tp & c);
+	//! Vector-4 initializer. Vector needs to be previously defined as length 4.
+	vectorx(const _Tp & a, const _Tp & b, const _Tp & c, const _Tp & d);
 	//! Copy constructor.
 	vectorx(const vectorx<_Tp, _size> &cpy);
 
@@ -277,13 +277,13 @@ public:
 	~vectorx();
 
 	//! Get pointer to the beginning of the vector data.
-	_Tp *getData();
+	_Tp *data();
 
 	//! Get item size(count) of the vector.
 	unsigned size() const;
 
 	//! Get byte size of the vector. It is defined as item count * sizeof(value_type)
-	unsigned byteSize() const;
+	unsigned byte_size() const;
 
 	//! Assignment operator to scalar value - same as construction of a scalar value.
 	template<class _Up>
@@ -898,43 +898,47 @@ vectorx<_Tp, _size>::vectorx() {
 template<class _Tp, unsigned _size>
 vectorx<_Tp, _size>::vectorx(const std::initializer_list<_Tp> &list) {
 	ASSERT(list.size() == _size);
-	LOOP_FOR_TO(_size)
+	for (unsigned i = 0; i < _size; ++i) {
 		this->_data[i] = *(list.begin() + i);
+	}
 }
 
 template<class _Tp, unsigned _size>
 vectorx<_Tp, _size>::vectorx(const _Tp &a) {
 	LOOP_FOR_TO(_size)
-		this->_data[i] = a;
+		_data[i] = a;
 }
 
+//! Vector-2 initializer. Vector needs to be previously defined as length 2.
 template<class _Tp, unsigned _size>
-vectorx<_Tp, _size>::vectorx(const _Tp &a, const _Tp &b) {
-	static_assert(_size == 2, "Invalid vector size-constructor.");
-	this->_data[0] = a;
-	this->_data[1] = b;
+vectorx<_Tp, _size>::vectorx(const _Tp & a, const _Tp & b) {
+	static_assert(_size == 2, " Vector needs to be previously defined as length 2");
+	_data[0] = a;
+	_data[1] = b;
 }
 
+//! Vector-3 initializer. Vector needs to be previously defined as length 3.
 template<class _Tp, unsigned _size>
-vectorx<_Tp, _size>::vectorx(const _Tp &a, const _Tp &b, const _Tp &c) {
-	static_assert(_size == 3, "Invalid vector size-constructor.");
-	this->_data[0] = a;
-	this->_data[1] = b;
-	this->_data[2] = c;
+vectorx<_Tp, _size>::vectorx(const _Tp & a, const _Tp & b, const _Tp & c) {
+	static_assert(_size == 3, " Vector needs to be previously defined as length 3");
+	_data[0] = a;
+	_data[1] = b;
+	_data[2] = c;
 }
 
+//! Vector-4 initializer. Vector needs to be previously defined as length 4.
 template<class _Tp, unsigned _size>
-vectorx<_Tp, _size>::vectorx(const _Tp &a, const _Tp &b, const _Tp &c, const _Tp &d) {
-	static_assert(_size == 4, "Invalid vector size-constructor.");
-	this->_data[0] = a;
-	this->_data[1] = b;
-	this->_data[2] = c;
-	this->_data[3] = d;
+vectorx<_Tp, _size>::vectorx(const _Tp & a, const _Tp & b, const _Tp & c, const _Tp & d) {
+	static_assert(_size == 4, " Vector needs to be previously defined as length 4");
+	_data[0] = a;
+	_data[1] = b;
+	_data[2] = c;
+	_data[3] = d;
 }
 
 template<class _Tp, unsigned _size>
 vectorx<_Tp, _size>::vectorx(const vectorx<_Tp, _size> &cpy) {
-	LOOP_FOR(0, _size, 1) {
+	for (unsigned i = 0; i < _size; ++i) {
 		this->_data[i] = cpy[i];
 	}
 }
@@ -945,7 +949,7 @@ vectorx<_Tp, _size>::vectorx(const vectorx<_Tp, _size / 2> &rhs, const vectorx<_
 		this->_data[i] = rhs[i];
 	}
 	LOOP_FOR(_size / 2, _size, 1) {
-		this->_data[i] = rhs[i - _size / 2];
+		this->_data[i] = lhs[i - _size / 2];
 	}
 }
 
@@ -954,7 +958,7 @@ vectorx<_Tp, _size>::~vectorx() {
 }
 
 template<class _Tp, unsigned _size>
-_Tp *vectorx<_Tp, _size>::getData() {
+_Tp *vectorx<_Tp, _size>::data() {
 	return this->_data;
 }
 
@@ -964,7 +968,7 @@ unsigned vectorx<_Tp, _size>::size() const {
 }
 
 template<class _Tp, unsigned _size>
-unsigned vectorx<_Tp, _size>::byteSize() const {
+unsigned vectorx<_Tp, _size>::byte_size() const {
 	return _size * sizeof(_Tp);
 }
 
