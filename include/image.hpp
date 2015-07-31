@@ -172,6 +172,8 @@ public:
      * @brief Split multichannel image_array to array of individual channels.
      *
      * Does not perform copy, but makes a reference array for each channel.
+	 *
+	 * Complexity O(1).
      */
     vector<image_array> split();
 
@@ -180,6 +182,8 @@ public:
      *
      * This method creates new array then copies channel data in the
      * merged array.
+	 *
+	 * Complexity O(n)
      */
     void merge(const vector<image_array> &channels);
 
@@ -227,6 +231,7 @@ public:
 		auto strides = this->_strides;
 		shape.resize(2);
 		strides.resize(2);
+		strides /= sizeof(_Tp);
         return matrix<_Tp>(data, begin, shape, strides, this->_refcount);
     }
 
