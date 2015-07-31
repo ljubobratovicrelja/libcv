@@ -117,6 +117,9 @@ enum parallelization_module {
 #define VECTOR_PARALLELIZATION_THRESHOLD 100000
 #endif
 
+#ifndef CV_BPQ_INIT_VALUE
+#define CV_BPQ_INIT_VALUE 10e+30
+#endif
 
 typedef unsigned refcount_type;
 
