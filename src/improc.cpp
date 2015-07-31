@@ -30,14 +30,12 @@ matrixr gauss(const vec2i &kernel_size, real_t theta) {
 	ASSERT(kernel_size[0] > 2 && kernel_size[1] > 2);
 	matrixr kernel(kernel_size[0], kernel_size[1]);
 
-	unsigned midPoint_r = (kernel_size[0] / 2);
-	unsigned midPoint_c = (kernel_size[1] / 2);
+	int midPoint_r = (kernel_size[0] / 2);
+	int midPoint_c = (kernel_size[1] / 2);
 
-	for (unsigned i = 0; i < kernel_size[0]; ++i) {
-		for (unsigned j = 0; j < kernel_size[1]; ++j) {
-		kernel(i, j) = (1 / (2 * PI * pow(theta, 2)))
-			* exp(-((pow(abs(midPoint_c - j), 2) + pow(abs(midPoint_r - i), 2)) / (2 * pow(theta, 2))));
-		}
+	NEST_FOR_TO(kernel_size[0], kernel_size[1])
+	{
+		kernel(i, j) = (1 / (2 * PI * pow(theta, 2))) * exp(-((pow(abs(midPoint_c - j), 2) + pow(abs(midPoint_r - i), 2)) / (2 * pow(theta, 2))));
 	}
 
 	return kernel;
@@ -91,38 +89,36 @@ matrixr conv(const matrixr &in, const matrixr &conv_kernel) {
 	return out;
 }
 
-matrixr harris(const matrixb &in, unsigned windowvec2i, real_t kValue, real_t gaussTheta) {
+template<class corner_detector>
+matrixr calc_corners(const matrixr &in, unsigned win_size, real_t gaussTheta, corner_detector cd) {
 
 	ASSERT(in);
 
-	matrixf in_d = in;
-	matrixf res = matrixf::zeros(in.size());
+	matrixr res = matrixr::zeros(in.size());
 	real_t gaus_del = 2.f * pow(gaussTheta, 2);
 
-	matrixf fx, fy;
-	calc_derivatives(in_d, fx, fy);
+	matrixr fx, fy;
+	calc_derivatives(in, fx, fy);
+
+	auto win_sqr = win_size * win_size;
 
 #pragma omp parallel
 	{
-		real_t R, T;  // Score value
+		real_t R;  // Score value
 		real_t gauss_val = 1, _gx, _gy, _r1, _r2, _r3;
 
 #pragma omp for schedule(dynamic)
-		for (unsigned i = 0; i < in.rows(); i++)
-			for (unsigned j = 0; j < in.cols(); j++)
-
-			{
-				if ((i + windowvec2i / 2 > in.rows() - 1) || (j + windowvec2i / 2 > in.cols() - 1)) {
+		for (int i = 0; i < in.rows(); i++)
+			for (int j = 0; j < in.cols(); j++) {
+				if ((i + win_size / 2 > in.rows() - 1) || (j + win_size / 2 > in.cols() - 1)) {
 					continue;
 				}
-
-				_r1 = _r2 = _r3 = .0f;
-
-				for (unsigned cr = i - windowvec2i / 2; cr < i + windowvec2i / 2; cr++) {
-					for (unsigned cc = j - windowvec2i / 2; cc < j + windowvec2i / 2; cc++) {
-
+				_r1 = 0.;
+				_r2 = 0.;
+				_r3 = 0.;
+				for (int cr = i - win_size / 2; cr < i + win_size / 2; cr++) {
+					for (int cc = j - win_size / 2; cc < j + win_size / 2; cc++) {
 						gauss_val = exp(-(((i - cr) * (i - cr)) + ((j - cc) * (j - cc))) / gaus_del);
-
 						_gx = fx(cr, cc);
 						_gy = fy(cr, cc);
 						_r1 += gauss_val * (_gx * _gx);
@@ -130,15 +126,40 @@ matrixr harris(const matrixb &in, unsigned windowvec2i, real_t kValue, real_t ga
 						_r3 += gauss_val * (_gy * _gy);
 					}
 				}
-
-				T = _r1 + _r3;
-				R = ((_r1 * _r3) - (_r2 * _r2)) - kValue * (T * T);
-
-				if (R > 0)
+				_r1 = (_r1 / win_sqr) * 0.5;
+				_r2 /= win_sqr;
+				_r3 = (_r3 / win_sqr) * 0.5;
+				R = cd(_r1, _r2, _r3);
+				if (R > 0) {
 					res(i, j) = R;
+				}
 			}
 	}
 	return res;
+}
+
+struct harris_detector {
+	real_t k;
+
+	harris_detector(real_t k) : k(k) {}
+
+	real_t operator()(real_t r1, real_t r2, real_t r3) {
+		return (((r1 * r1) - (r2 * r3)) -  k*((r1+r3) * r1+r3));
+	}
+};
+
+struct shi_tomasi_detector {
+	real_t operator()(real_t r1, real_t r2, real_t r3) {
+		return ((r1 + r3) - std::sqrt((r1 - r3) * (r1 - r3) + r2 * r2));
+	}
+};
+
+matrixr harris(const matrixr &in, unsigned win_size, real_t k, real_t gauss) {
+	return calc_corners(in, win_size, gauss, harris_detector(k)); 
+}
+
+matrixr good_features(const matrixr &in, unsigned  win_size, real_t gauss) {
+	return calc_corners(in, win_size, gauss, shi_tomasi_detector());
 }
 }
 
