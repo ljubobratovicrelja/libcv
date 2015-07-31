@@ -285,11 +285,11 @@ class polygon: public contour<_Tp> {
 	polygon &operator=(const polygon &) = default;
 	polygon &operator=(polygon &&) = default;
 
-	unsigned pointInPolygon(point_const_reference ptn) const {
-		return pointInPolygon(ptn[0], ptn[1]);
+	unsigned point_in_polygon(point_const_reference ptn) const {
+		return point_in_polygon(ptn[0], ptn[1]);
 	}
 
-	unsigned pointInPolygon(const_reference x, const_reference y) const {
+	unsigned point_in_polygon(const_reference x, const_reference y) const {
 		unsigned i, j, c = 0;
 		point_type *pt_data = this->_pts.data();
 		for (i = 0, j = this->point_length() - 1; i < this->point_length(); j = i++) {
