@@ -102,7 +102,32 @@ image_array::image_array(const vector<image_array> &channels) : super_type() {
 	this->merge(channels);
 }
 
-image_array::image_array(const image_array &cpy, bool deep_copy) : super_type(cpy, deep_copy), _dtype(cpy._dtype) {
+image_array::image_array(const image_array &cpy, bool deep_copy) : super_type(), _dtype(cpy._dtype) {
+	if (!cpy)
+		return;
+	else {
+		if (deep_copy) {
+			auto dt_size = internal::data_size[cpy.dtype()];
+			this->allocate(cpy.shape(), dt_size);
+			if (cpy.is_contiguous()) {
+				std::memcpy(reinterpret_cast<void*>(this->_begin), reinterpret_cast<void*>(cpy._begin),
+						cpy.shape().product()*dt_size);
+			} else {
+				for(unsigned i = 0; i < cpy.rows(); ++i) {
+					for(unsigned j = 0; j < cpy.cols(); ++j) {
+						for (unsigned k = 0; k < cpy.channels(); ++k) {
+							std::memcpy(reinterpret_cast<void*>(&this->at_index(i, j, k)), 
+									reinterpret_cast<void*>(const_cast<byte*>(&cpy.at_index(i, j, k))), 
+									dt_size);
+						}
+					}
+				}
+			}
+		} else {
+			this->copy(cpy, false); 
+		}
+	}
+	
 }
 
 image_array::image_array(image_array &&move) {
