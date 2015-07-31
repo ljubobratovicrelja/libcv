@@ -232,21 +232,21 @@ index_array &index_array::operator+=(unsigned rhs) {
 
 index_array &index_array::operator-=(unsigned rhs) {
     for (auto &v : *this) {
-        v += rhs;
+        v -= rhs;
     }
     return *this;
 }
 
 index_array &index_array::operator/=(unsigned rhs) {
     for (auto &v : *this) {
-        v += rhs;
+        v /= rhs;
     }
     return *this;
 }
 
 index_array &index_array::operator*=(unsigned rhs) {
     for (auto &v : *this) {
-        v += rhs;
+        v *= rhs;
     }
     return *this;
 }
