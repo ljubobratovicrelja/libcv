@@ -38,19 +38,6 @@
 
 namespace cv {
 
-namespace internal {
-// Index comparator used for comparing arrays by only one axis values.
-struct idx_cmp {
-	unsigned index = 0;
-
-	idx_cmp(unsigned index) : index(index) {}
-
-	template<typename _ArrayType>
-	bool operator ()(const _ArrayType &rhs, const _ArrayType &lhs) const {
-		return (rhs[index] < lhs[index]);
-	}
-};
-}
 
 /*!
  * @brief 2D contour template class.
@@ -72,7 +59,7 @@ class contour {
 		POINT_OUT_OF_POLYGON = 0, POINT_IN_POLYGON = 1, POINT_ON_EDGE = 2
 	};
 
-  private:
+  protected:
 	std::vector<point_type> _pts; // point array which defines the contour in index ordered manor.
 
   public:
@@ -139,7 +126,9 @@ class contour {
 	}
 	//! Add multiple points to the contour.
 	void add_points(const std::vector<point_type> &ptns) {
-		this->_pts.insert(ptns.begin(), ptns.end());
+		for (auto i : ptns) {
+			this->_pts.push_back(i);
+		}
 	}
 	//! Remove point from the contour.
 	void remove_point(unsigned index) {
@@ -167,7 +156,7 @@ class contour {
 	}
 
 	unsigned point_length() const {
-		return this->_pts.length();
+		return this->_pts.size();
 	}
 
 	void sort_by_axis(unsigned axis) {
@@ -176,9 +165,9 @@ class contour {
 	}
 
 	regiond get_bounding_box() const {
-		point_type min, max, *data;
+		point_type min, max;
 
-		data = this->_pts.data();
+		auto data = this->_pts.data();
 		bool init = false;
 
 		for (int i = 0; i < this->point_length(); ++i) {
@@ -213,14 +202,14 @@ class contour {
 		return this->_pts[index];
 	}
 
-	contour &operator <<(point_const_reference ptn) {
+	contour &operator <<(const vectorx<_Tp, 2> &ptn) {
 		this->_pts.push_back(ptn);
-		return this;
+		return *this;
 	}
 
-	contour &operator <<(const std::vector<point_const_reference> &ptn) {
+	contour &operator <<(const std::vector<vectorx<_Tp, 2> > &ptn) {
 		this->add_points(ptn);
-		return this;
+		return *this;
 	}
 
 	bool operator ==(const contour &rhs) const {
@@ -291,7 +280,7 @@ class polygon: public contour<_Tp> {
 
 	unsigned point_in_polygon(const_reference x, const_reference y) const {
 		unsigned i, j, c = 0;
-		point_type *pt_data = this->_pts.data();
+		auto pt_data = this->_pts.data();
 		for (i = 0, j = this->point_length() - 1; i < this->point_length(); j = i++) {
 			if (((pt_data[i][1] > y) != (pt_data[j][1] > y))
 			        && (x
@@ -309,16 +298,6 @@ class polygon: public contour<_Tp> {
 
 	point_const_reference operator[](unsigned index) const {
 		return this->_pts[index];
-	}
-
-	polygon &operator <<(point_const_reference ptn) {
-		this->add_point(ptn);
-		return this;
-	}
-
-	polygon &operator <<(const std::vector<point_const_reference> &ptn) {
-		this->add_points(ptn);
-		return this;
 	}
 
 	bool operator ==(const polygon &rhs) const {
@@ -356,9 +335,18 @@ typedef polygon<double> polygond;
 typedef polygon<int> polygoni;
 typedef polygon<short> polygons;
 
+#ifdef CV_REAL_TYPE_DOUBLE
+typedef contourd countourr;
+typedef polygond polygonr;
+#else
+typedef contourf countourr;
+typedef polygonf polygonr;
+#endif
+
 }
 
 #endif /* end of include guard: CONTOUR_HPP_XOOB1YC7 */
+
 
 
 
