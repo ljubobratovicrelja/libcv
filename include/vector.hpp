@@ -415,6 +415,18 @@ typedef point2i point;
 typedef vec3b color3;
 typedef vec4b color4;
 
+#ifdef CV_REAL_TYPE_DOUBLE
+typedef vec2d vec2r;
+typedef vec3d vec3r;
+typedef vec4d vec4r;
+typedef vec6d vec6r;
+#else
+typedef vec2f vec2r;
+typedef vec3f vec3r;
+typedef vec4f vec4r;
+typedef vec6f vec6r;
+#endif
+
 // Implementation
 
 template<class _Tp>
