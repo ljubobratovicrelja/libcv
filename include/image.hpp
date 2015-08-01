@@ -302,14 +302,23 @@ image_array::image_array(const matrix<vectorx<_Tp, _Channels> > &matrix, bool de
     }
     if (deep_copy) {
         this->allocate(matrix.rows(), matrix.cols(), _Channels, sizeof(_Tp));
-        this->_refcount = matrix._refcount;
-        REF_INCREMENT(this->_refcount);
+		this->_refcount = REF_NEW;
+		if (matrix.is_contiguous()) {
+			std::memcpy(this->_begin, matrix.data_begin(), matrix.rows()*matrix.cols()*sizeof(_Tp));
+		} else {
+			for (unsigned i = 0; i < matrix.rows(); ++i) {
+				for (unsigned j = 0; j < matrix.cols(); ++j) {
+					std::memcpy(reinterpret_cast<void*>(&this->at_index(i, j, 0)),
+								reinterpret_cast<void*>(const_cast<_Tp*>(matrix(i, j))), sizeof(_Tp));
+				}
+			}
+		}
     } else {
-        this->_data = reinterpret_cast<byte*>(matrix._data);
-        this->_begin = reinterpret_cast<byte*>(matrix._begin);
+        this->_data = reinterpret_cast<byte*>(const_cast<vectorx<_Tp, _Channels>* >(matrix.data()));
+        this->_begin = reinterpret_cast<byte*>(const_cast<vectorx<_Tp, _Channels>* >(matrix.data_begin()));
         this->_shape = {matrix.rows(), matrix.cols(), _Channels};
         this->_strides = {matrix.cols()*_Channels*sizeof(_Tp), _Channels*sizeof(_Tp), sizeof(_Tp)};
-        this->_refcount = matrix._refcount;
+        this->_refcount = matrix.refcounter();
         REF_INCREMENT(this->_refcount);
     }
 }
