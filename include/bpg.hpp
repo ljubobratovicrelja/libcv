@@ -60,17 +60,17 @@ namespace cv {
  * be enqueued.
  *
  */
-template<class _Tp, unsigned _Dim, class _ComparatorType = std::less<real_t> >
+template<typename _Tp, class _ComparatorType = std::less<real_t> >
 class priority_queue {
 public:
 	typedef _ComparatorType comparator_type;
-	typedef vectorx<_Tp, _Dim> point_type;
-	typedef point_type &reference;
-	typedef const point_type &const_reference;
+	typedef _Tp value_type;
+	typedef value_type &reference;
+	typedef const value_type &const_reference;
 
 private:
 	real_t *_score;
-	point_type *_data;
+	value_type *_data;
 	unsigned _length;
 	real_t _init_score;
 	comparator_type _cmp_model;
@@ -78,7 +78,7 @@ private:
 	void allocate(unsigned length) {
 		if (length > 0) {
 			this->_score = new real_t[length];
-			this->_data = new point_type[length];
+			this->_data = new value_type[length];
 		} else {
 			this->_score = nullptr;
 			this->_data = nullptr;
@@ -184,7 +184,7 @@ public:
 	}
 
 	//! Append item to queue.
-	void enque(const point_type &in, real_t score) {
+	void enque(const value_type &in, real_t score) {
 		ASSERT(*this && score >= 0);
 
 		for(unsigned i = 0; i < this->length(); ++i) {
