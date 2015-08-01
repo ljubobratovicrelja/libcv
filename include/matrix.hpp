@@ -66,14 +66,10 @@ class matrix: public basic_array < _Tp > {
 	matrix();
 	//! Class constructor.
 	matrix(unsigned rows, unsigned cols);
-	//! Class constructor.
-	matrix(unsigned rows, unsigned cols, const _Tp & value);
 	//! Matrix initializer constructor.
 	matrix(const std::initializer_list<std::initializer_list<_Tp> > &m);
 	//! Class constructor.
 	matrix(vec2i size);
-	//! Class constructor.
-	matrix(vec2i size, const _Tp & value);
 
 	//! Class constructor.
 	matrix(unsigned rows, unsigned cols, pointer data, refcount_type *refcounter = nullptr);
@@ -251,13 +247,6 @@ matrix<_Tp>::matrix(unsigned rows, unsigned cols) :
 }
 
 template<typename _Tp>
-matrix<_Tp>::matrix(unsigned rows, unsigned cols, const _Tp & val):
-	super_type(rows, cols) {
-	ASSERT(rows && cols);
-	this->fill(val);
-}
-
-template<typename _Tp>
 matrix<_Tp>::matrix(const std::initializer_list<std::initializer_list<_Tp> > &m) : super_type() {
 	ASSERT(m.size() && m.begin()->size());
 	unsigned r = m.size();
@@ -276,12 +265,6 @@ matrix<_Tp>::matrix(const std::initializer_list<std::initializer_list<_Tp> > &m)
 template<typename _Tp>
 matrix<_Tp>::matrix(vec2i size):
 	super_type(size[0], size[1]) {
-}
-
-template<typename _Tp>
-matrix<_Tp>::matrix(vec2i size, const _Tp & val):
-	super_type(size[0], size[1]) {
-		this->fill(val);
 }
 
 template<typename _Tp>
@@ -365,7 +348,9 @@ void matrix<_Tp>::create(unsigned row, unsigned col, unsigned rows, unsigned col
 
 template<typename _Tp>
 matrix<_Tp> matrix<_Tp>::zeros(unsigned rows, unsigned cols) {
-	return matrix<_Tp>(rows, cols, 0);
+	matrix<_Tp> z(rows, cols);
+	z.fill(0);
+	return z;
 }
 
 template<typename _Tp>
@@ -385,7 +370,9 @@ matrix<_Tp> matrix<_Tp>::eye(unsigned size) {
 
 template<typename _Tp>
 matrix<_Tp> matrix<_Tp>::zeros(vec2i size) {
-	return matrix<_Tp>(size, 0);
+	matrix<_Tp> z(size);
+	z.fill(0);
+	return z;
 }
 
 template<typename _Tp>
