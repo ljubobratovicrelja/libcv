@@ -206,6 +206,20 @@ enum class ImageFormat {
 	RGBA = 4
 };
 
+namespace internal {
+// Index comparator used for comparing arrays by only one axis values.
+struct idx_cmp {
+	unsigned index = 0;
+
+	idx_cmp(unsigned index) : index(index) {}
+
+	template<typename _ArrayType>
+	bool operator ()(const _ArrayType &rhs, const _ArrayType &lhs) const {
+		return (rhs[index] < lhs[index]);
+	}
+};
+
+}
 }
 
 #endif /* end of include guard: FWD_HPP_1F9LO7BS*/
