@@ -1008,7 +1008,7 @@ template<unsigned o_size>
 vectorx<_Tp, _size> vectorx<_Tp, _size>::operator=(const vectorx<_Tp, o_size> &rhs) {
 	unsigned lesser = std::min(_size, o_size);
 	if (this != &rhs) {
-		LOOP_FOR_TO(lesser) {
+		for (unsigned i = 0; i < lesser; ++i) {
 			this->_data[i] = rhs[i];
 		}
 	}
@@ -1019,7 +1019,7 @@ template<class _Tp, unsigned _size>
 vectorx<_Tp, _size> vectorx<_Tp, _size>::operator+(const vectorx<_Tp, _size>& rhs) const {
 	vectorx<_Tp, _size> ret;
 	LOOP_FOR(0, _size, 1) {
-		ret = rhs._data[i] + this->_data[i];
+		ret[i] = rhs._data[i] + this->_data[i];
 	}
 	return ret;
 }
@@ -1044,7 +1044,7 @@ template<class _Tp, unsigned _size>
 vectorx<_Tp, _size> vectorx<_Tp, _size>::operator-(const vectorx<_Tp, _size>& rhs) const {
 	vectorx<_Tp, _size> ret;
 	LOOP_FOR(0, _size, 1) {
-		ret = rhs._data[i] - this->_data[i];
+		ret[i] = rhs._data[i] - this->_data[i];
 	}
 	return ret;
 }
@@ -1069,7 +1069,7 @@ template<class _Tp, unsigned _size>
 vectorx<_Tp, _size> vectorx<_Tp, _size>::operator*(const vectorx<_Tp, _size>& rhs) const {
 	vectorx<_Tp, _size> ret;
 	LOOP_FOR(0, _size, 1) {
-		ret = rhs * this->_data[i];
+		ret[i] = rhs._data[i] * this->_data[i];
 	}
 	return ret;
 }
@@ -1086,7 +1086,7 @@ template<class _Tp, unsigned _size>
 vectorx<_Tp, _size> vectorx<_Tp, _size>::operator/(const vectorx<_Tp, _size>& rhs) const {
 	vectorx<_Tp, _size> ret;
 	LOOP_FOR(0, _size, 1) {
-		ret = rhs._data[i] / this->_data[i];
+		ret[i] = rhs._data[i] / this->_data[i];
 	}
 	return ret;
 }
