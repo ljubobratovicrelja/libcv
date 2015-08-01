@@ -301,7 +301,7 @@ image_array::image_array(const matrix<vectorx<_Tp, _Channels> > &matrix, bool de
         return;
     }
     if (deep_copy) {
-        this->allocate(matrix.rows(), matrix.cols(), _Channels, sizeof(_Tp));
+        this->allocate({matrix.rows(), matrix.cols(), _Channels}, sizeof(_Tp));
 		this->_refcount = REF_NEW;
 		if (matrix.is_contiguous()) {
 			std::memcpy(this->_begin, matrix.data_begin(), matrix.rows()*matrix.cols()*sizeof(_Tp));
@@ -309,7 +309,7 @@ image_array::image_array(const matrix<vectorx<_Tp, _Channels> > &matrix, bool de
 			for (unsigned i = 0; i < matrix.rows(); ++i) {
 				for (unsigned j = 0; j < matrix.cols(); ++j) {
 					std::memcpy(reinterpret_cast<void*>(&this->at_index(i, j, 0)),
-								reinterpret_cast<void*>(const_cast<_Tp*>(matrix(i, j))), sizeof(_Tp));
+								reinterpret_cast<void*>(const_cast<vectorx<_Tp, _Channels> *>(&matrix(i, j))), sizeof(_Tp));
 				}
 			}
 		}
