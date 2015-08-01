@@ -259,7 +259,7 @@ void global_image_application::destroy_all_windows() {
 void imshow(const std::string &name, const image_array &image) {
 	ASSERT(image.is_valid() && (image.channels() == 1 || image.channels() == 3 || image.channels() == 4));
 	if (image.depth() != 1) {
-		image_array byte_copy = image.clone();
+		auto byte_copy = image.clone();
 		byte_copy.convert_to<byte>();
 		global_image_application::singleton()->create_window(name, byte_copy);
 	} else {
