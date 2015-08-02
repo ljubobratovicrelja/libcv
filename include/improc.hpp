@@ -45,7 +45,7 @@ namespace cv {
 /*!
  * @brief Generate Gauss kernel operator
  */
-matrixr CV_EXPORT gauss(const vec2i &kernelvec2i, real_t theta = .84);
+matrixr CV_EXPORT gauss(const vec2i &kernel, real_t theta = .84);
 
 /*!
  * @brief Image (2D) spatial convolution algorithm.
@@ -55,7 +55,12 @@ matrixr CV_EXPORT conv(const matrixr &in, const matrixr &conv_kernel);
 /*!
  * @brief Harris corner detector.
  */
-matrixr CV_EXPORT harris(const matrixb &in, unsigned windowvec2i, real_t kValue, real_t gaussTheta);
+matrixr CV_EXPORT harris(const matrixr &in, unsigned win_size = 3, real_t k = .64, real_t gauss = .84);
+
+/*!
+ * @brief Shi-Tomasi good features to track corner detector.
+ */
+matrixr CV_EXPORT good_features(const matrixr &in, unsigned win_size = 3, real_t gauss = .84);
 
 template<typename _Tp, size_t cnt> inline
 matrix<_Tp> color_to_gray(matrix<vectorx<_Tp, cnt> > in) {
@@ -104,33 +109,42 @@ void calc_derivatives(const matrix<_Tp> &in, matrix<_Tp> &fx, matrix<_Tp> &fy) {
 	fy.create(in.size());
 
 	// calc mid-ground
-	for (unsigned r = 1; r < in.rows(); r++)
+	for (unsigned r = 1; r < in.rows(); r++) {
 		for (unsigned c = 1; c < in.cols(); c++) {
-			fx(r, c) = -in(r, c - 1) + in(r, c);
-			fy(r, c) = -in(r - 1, c) + in(r, c);
+			fx(r, c) = -1*in(r, c - 1) + in(r, c);
+			fy(r, c) = -1*in(r - 1, c) + in(r, c);
 		}
-	// calc first edges
-	for (unsigned r = 0; r < 1; r++)
-		for (unsigned c = 0; c < 1; c++) {
-			fx(r, c) = -in(r, c) + in(r, c + 1);
-			fy(r, c) = -in(r, c) + in(r + 1, c);
-		}
+	}
+	// calc border edges
+	for (unsigned c = 0; c < in.cols() - 1; c++) {
+		fx(0, c) = -1*in(0, c) + in(0, c + 1);
+		fy(0, c) = -1*in(0, c) + in(1, c);
+	}
+	for (unsigned r = 0; r < in.rows() - 1; r++) {
+		fx(r, 0) = -1*in(r, 0) + in(r, 1);
+		fy(r, 0) = -1*in(r, 0) + in(r + 1, 0);
+	}
+	// edges corner pixels
+	fx(0, in.cols()-1) = -1*in(0, in.cols()-2) + in(0, in.cols()-1);
+	fy(0, in.cols()-1) = -1*in(0, in.cols()-1) + in(1, in.cols()-1);
+	fx(in.rows()-1, 0) = -1*in(in.rows()-1, 0) + in(in.rows()-1, 1);
+	fy(in.rows()-1, 0) = -1*in(in.rows()-2, 0) + in(in.rows()-1, 0);
 }
 
 template<typename _Tp>
-void filter_non_maximum(matrix<_Tp> &in, size_t filtervec2i) {
+void filter_non_maximum(matrix<_Tp> &in, size_t filter_size) {
 
-	ASSERT(in && filtervec2i);
+	ASSERT(in && filter_size);
 
 	matrix<_Tp> lmsw;  // local maxima search window
 	int lms_r, lms_c;
 	int win_rows, win_cols;
 	real_t lms_val;
 
-	for (int br = 0; br < in.rows(); br += filtervec2i / 2) {
-		for (int bc = 0; bc < in.cols(); bc += filtervec2i / 2) {
-			win_rows = (br + filtervec2i < in.rows()) ? filtervec2i : filtervec2i - ((br + filtervec2i) - in.rows()) - 1;
-			win_cols = (bc + filtervec2i < in.cols()) ? filtervec2i : filtervec2i - ((bc + filtervec2i) - in.cols()) - 1;
+	for (int br = 0; br < in.rows(); br += filter_size / 2) {
+		for (int bc = 0; bc < in.cols(); bc += filter_size / 2) {
+			win_rows = (br + filter_size < in.rows()) ? filter_size : filter_size - ((br + filter_size) - in.rows()) - 1;
+			win_cols = (bc + filter_size < in.cols()) ? filter_size : filter_size - ((bc + filter_size) - in.cols()) - 1;
 
 			if (win_rows <= 0 || win_cols <= 0) {
 				continue;
@@ -148,7 +162,7 @@ void filter_non_maximum(matrix<_Tp> &in, size_t filtervec2i) {
 					}
 				}
 			}
-			lmsw.toZero();
+			lmsw.to_zero();
 			if (lms_val != -1) {
 				lmsw(lms_r, lms_c) = lms_val;
 			}
