@@ -105,7 +105,7 @@ class matrix: public basic_array < _Tp > {
 
 	//! Create submatrix from other matrix.
 	void create(unsigned row, unsigned col, unsigned rows, unsigned cols, const matrix<_Tp>& source, RoiType allocation =
-	                RoiType::COPY, RoiEdge edgeManage = RoiEdge::MIRROR);
+	                RoiType::REFERENCE, RoiEdge edgeManage = RoiEdge::MIRROR);
 
 	//! Matlab-like static zeros initializer. Creates matrix filled with zeros of appropriate type.
 	static matrix<_Tp> zeros(unsigned rows, unsigned cols);
