@@ -83,7 +83,7 @@ private:
 			this->_score = nullptr;
 			this->_data = nullptr;
 		}
-		this->_lenght = length;
+		this->_length = length;
 	}
 
 	void deallocate() {
@@ -238,6 +238,10 @@ public:
 				dist = this->_score[i];
 		}
 		return dist;
+	}
+	//! Get length of the queue.
+	unsigned length() const {
+		return this->_length;
 	}
 };
 
