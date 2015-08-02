@@ -132,6 +132,7 @@ class contour {
 	}
 	//! Remove point from the contour.
 	void remove_point(unsigned index) {
+		ASSERT(index < this->_pts.size());
 		this->_pts.remove(this->_pts.begin() + index);
 	}
 
@@ -140,23 +141,30 @@ class contour {
 	}
 
 	point_reference get_point(unsigned index) {
+		ASSERT(index < this->_pts.size());
 		return this->_pts[index];
 	}
 
 	point_const_reference get_point(unsigned index) const {
+		ASSERT(index < this->_pts.size());
 		return this->_pts[index];
 	}
 
-	vec2d get_edge_vector(unsigned startId, unsigned endId) const {
-		return vec2d(this->_pts[endId] - this->_pts[startId]);
+	vec2r get_edge_vector(unsigned startId, unsigned endId) const {
+		ASSERT(startId < this->_pts.size() && endId < this->_pts.size() && startId < endId);
+		return (this->_pts[endId] - this->_pts[startId]);
 	}
 
-	vec2d get_contour_vector() const {
-		return this->get_edge_vector(0, -1);
+	vec2r get_contour_vector() const {
+		return this->get_edge_vector(0, this->point_length() - 1);
 	}
 
 	unsigned point_length() const {
 		return this->_pts.size();
+	}
+
+	bool empty() const {
+		return this->point_length() == 0;
 	}
 
 	void sort_by_axis(unsigned axis) {
@@ -195,10 +203,12 @@ class contour {
 	}
 
 	point_reference operator[](unsigned index) {
+		ASSERT(index < this->_pts.size());
 		return this->_pts[index];
 	}
 
 	point_const_reference operator[](unsigned index) const {
+		ASSERT(index < this->_pts.size());
 		return this->_pts[index];
 	}
 
