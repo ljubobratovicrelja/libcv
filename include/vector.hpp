@@ -36,6 +36,38 @@
 
 namespace cv {
 
+namespace internal {
+
+template<class const_iterator>
+real_t norm(const_iterator begin, const_iterator end, Norm n) {
+	real_t nv = 0;
+	switch (n) {
+		case Norm::L1:
+			do {
+				nv += std::fabs(*begin);
+			} while (++begin != end);
+			break;
+		case Norm::L2:
+			do {
+				nv += *begin*(*begin);
+			} while (++begin != end);
+			nv = sqrt(nv);
+			break;
+		default:
+			throw std::runtime_error("Norm type not supported");
+	}
+	return nv;
+}
+
+template<class iterator>
+void normalize(iterator begin, iterator end, Norm n) {
+	auto nv = internal::norm(begin, end, n);
+	do {
+		*begin /= nv;
+	} while (++begin != end);
+}
+}
+
 /*!
  * @brief Vector class with data allocated on heap.
  *
@@ -53,6 +85,7 @@ public:
 
 	typedef bidirectional_iterator<_Tp> iterator; //!< Iterator type.
 	typedef bidirectional_iterator<const _Tp> const_iterator; //!< Read-only bidirectional_iterator type.
+
 	typedef basic_array<_Tp> super_type; //! Type of the super class.
 
 public:
@@ -174,9 +207,9 @@ public:
 	void fill(const _Tp &value);
 
 	//! Calculate norm of the vector.
-	double norm(Norm n = Norm::L2) const;
+	real_t norm(Norm n = Norm::L2) const;
 	//! Calculate distance of two vectors. Need to be of same size.
-	double distance(const vector &rhs, Norm n = Norm::L2) const;
+	real_t distance(const vector &rhs, Norm n = Norm::L2) const;
 
 	//! Normalize this vector.
 	void normalize(Norm n = Norm::L2);
@@ -317,12 +350,27 @@ public:
 	//! Item-wise divide operator.
 	vectorx<_Tp, _size>& operator/=(const vectorx<_Tp, _size>& rhs);
 
+	//! Calculate norm of the vector.
+	real_t norm(Norm n = Norm::L2) const;
+	//! Normalize this vector.
+	void normalize(Norm n = Norm::L2);
+	//! Get normalized copy of this vector.
+	vectorx normalized(Norm n = Norm::L2) const;
 	//! Calculate eucledian distance (L2 norm of vector) to other vector(point).
-	double distance(const vectorx<_Tp, _size> &lhs, unsigned axis = -1) const;
+	real_t distance(const vectorx<_Tp, _size> &lhs, unsigned axis = -1) const;
 	//! Calculate sum of each item in vector.
-	double sum() const;
+	real_t sum() const;
 	//! Calculate mean value of vector.
-	double mean() const;
+	real_t mean() const;
+	//! Calculate an angle between this and given vector.
+	real_t angle(const vectorx<_Tp, _size> &v) const;
+	 //! Rotate 2-d vector by an angle (in radians).
+	vectorx<_Tp, _size>& rotate(real_t angle);
+	//! Calculate dot product.
+	_Tp dot(const vectorx<_Tp, _size> &rhs) const;
+	//! Calculate cross product for 2 and 3 dimensional vector.
+	vectorx<_Tp, _size> cross(const vectorx<_Tp, _size> &rhs) const;
+
 	//! Equals operator.
 	bool operator==(const vectorx<_Tp, _size>& rhs) const;
 	//! Not-equals operator.
@@ -353,7 +401,6 @@ public:
 	const_iterator end() const {
 		return const_iterator(&_data[_size]);
 	}
-
 	//! Get vector with values ranged from inside this vector. Does not reference data, but makes a copy.
 	template<unsigned range_data, unsigned range_end>
 		vectorx<_Tp, range_end - range_data> range();
@@ -628,32 +675,13 @@ void vector<_Tp>::sort() {
 }
 
 template<class _Tp>
-double vector<_Tp>::norm(Norm n) const {
-	double nv = 0;
-	switch (n) {
-		case Norm::L1:
-			for (auto v : *this) {
-				nv += std::fabs(v);
-			}
-			break;
-		case Norm::L2:
-			for (auto v : *this) {
-				nv += v*v;
-			}
-			nv = sqrt(nv);
-			break;
-		default:
-			throw std::runtime_error("Norm type not supported");
-	}
-	return nv;
+real_t vector<_Tp>::norm(Norm n) const {
+	return internal::norm(this->begin(), this->end(), n);
 }
 
 template<class _Tp>
 void vector<_Tp>::normalize(Norm n) {
-	auto nv = this->norm(n);
-	for (auto &v : *this) {
-		v /= nv;
-	}
+	internal::normalize(this->begin(), this->end(), n);
 }
 
 template<class _Tp>
@@ -664,9 +692,9 @@ vector<_Tp> vector<_Tp>::normalized(Norm n) const {
 }
 
 template<class _Tp>
-double vector<_Tp>::distance(const vector<_Tp> &rhs, Norm n) const {
+real_t vector<_Tp>::distance(const vector<_Tp> &rhs, Norm n) const {
 	ASSERT(this->length() == rhs.length());
-	double d = 0;
+	real_t d = 0;
 
 	switch (n) {
 		case Norm::L1:
@@ -1100,8 +1128,25 @@ vectorx<_Tp, _size>& vectorx<_Tp, _size>::operator/=(const vectorx<_Tp, _size>& 
 }
 
 template<class _Tp, unsigned _size>
-double vectorx<_Tp, _size>::distance(const vectorx<_Tp, _size> &lhs, unsigned axis) const {
-	double distVal = 0;
+real_t vectorx<_Tp, _size>::norm(Norm n) const {
+	return internal::norm(this->_data, this->_data + _size, n);
+}
+
+template<class _Tp, unsigned _size>
+void vectorx<_Tp, _size>::normalize(Norm n) {
+	internal::normalize(this->_data, this->_data + _size, n);
+}
+
+template<class _Tp, unsigned _size>
+vectorx<_Tp, _size> vectorx<_Tp, _size>::normalized(Norm n) const {
+	auto r = *this;
+	r.normalize(n);
+	return r;
+}
+
+template<class _Tp, unsigned _size>
+real_t vectorx<_Tp, _size>::distance(const vectorx<_Tp, _size> &lhs, unsigned axis) const {
+	real_t distVal = 0;
 	if (axis == -1) {
 		LOOP_FOR_TO(_size) {
 			distVal += pow((*this)[i] - lhs[i], 2);
@@ -1114,17 +1159,67 @@ double vectorx<_Tp, _size>::distance(const vectorx<_Tp, _size> &lhs, unsigned ax
 }
 
 template<class _Tp, unsigned _size>
-double vectorx<_Tp, _size>::sum() const {
-	double retVal = 0;
+real_t vectorx<_Tp, _size>::sum() const {
+	real_t retVal = 0;
 	LOOP_FOR(0, _size, 1) {
-		retVal += (double)this->_data[i];
+		retVal += (real_t)this->_data[i];
 	}
 	return retVal;
 }
 
 template<class _Tp, unsigned _size>
-double vectorx<_Tp, _size>::mean() const {
+real_t vectorx<_Tp, _size>::mean() const {
 	return (sum() / _size);
+}
+
+template<class _Tp, unsigned _size>
+real_t vectorx<_Tp, _size>::angle(const vectorx<_Tp, _size> &v) const {
+
+	real_t ang;
+
+	if ((*this).norm() == 0.0 || v.norm() == 0.0) {
+		ang = 0;
+	} else {
+		ang = acos((this->dot(v)) / (this->norm() * v.norm()));
+	}
+
+	return ang;
+}
+
+template<class _Tp, unsigned _size>
+vectorx<_Tp, _size>& vectorx<_Tp, _size>::rotate(real_t angle) {
+	static_assert(_size == 2, "Rotation is only allowed for 2D vectors.");
+	_Tp new_x, new_y;
+
+	new_x = this->_data[0] * cos(angle) - this->_data[1] * sin(angle);
+	new_y = this->_data[0] * sin(angle) + this->_data[1] * cos(angle);
+
+	this->x() = new_x;
+	this->y() = new_y;
+
+	return *this;
+}
+
+template<class _Tp, unsigned _size>
+_Tp vectorx<_Tp, _size>::dot(const vectorx<_Tp, _size> &rhs) const {
+	_Tp d = 0;
+	for (unsigned i = 0; i < _size; ++i) {
+		d += this->_data[i] * rhs[i];
+	}
+	return d;
+}
+
+template<class _Tp, unsigned _size>
+vectorx<_Tp, _size> vectorx<_Tp, _size>::cross(const vectorx<_Tp, _size> &rhs) const {
+	static_assert(_size == 2 || _size == 3, "Cross product only applies to 2D and 3D vectors");
+	vectorx<_Tp, _size> c;
+	if (_size == 2) {
+		c[0] = this->_data[0] - rhs._data[1];
+		c[1] =  rhs._data[0] - this->_data[1];
+	} else {
+		throw std::runtime_error("3D cross product is not yet implemented");
+	}
+	return c;
 }
 
 template<class _Tp, unsigned _size>
@@ -1171,7 +1266,7 @@ template<unsigned _new_size>
 vectorx<_Tp, _size>::operator vectorx<_Tp, _new_size>() const {
 	vectorx<_Tp, _new_size> newVec;
 	unsigned lesser = std::min(_size, _new_size);
-	LOOP_FOR_TO(lesser) {
+	for (unsigned i = 0; i < lesser; ++i) {
 		newVec[i] = this->_data[i];
 	}
 	return newVec;
@@ -1187,7 +1282,6 @@ vectorx<_Tp, range_end - range_start> vectorx<_Tp, _size>::range() {
 	}
 	return retVal;
 }
-
 
 }
 #endif /* end of include guard: VECTOR_HPP_TRD8NTPW */
