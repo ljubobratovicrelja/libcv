@@ -26,6 +26,16 @@
 
 namespace cv {
 
+namespace internal {
+
+struct feature_par_cmp {
+	bool operator () (const std::pair<vec2r, real_t> &r1, const std::pair<vec2r, real_t> &r2) const {
+		return (r1.second < r2.second);
+	}
+};
+
+}
+
 matrixr gauss(const vec2i &kernel_size, real_t theta) {
 	ASSERT(kernel_size[0] > 2 && kernel_size[1] > 2);
 	matrixr kernel(kernel_size[0], kernel_size[1]);
@@ -161,5 +171,33 @@ matrixr harris(const matrixr &in, unsigned win_size, real_t k, real_t gauss) {
 matrixr good_features(const matrixr &in, unsigned  win_size, real_t gauss) {
 	return calc_corners(in, win_size, gauss, shi_tomasi_detector());
 }
+
+std::vector<vec2r> extract_features(const matrixr &in, int count) {
+	
+	std::vector<std::pair<vec2r, real_t> > f_vals;
+
+	for(unsigned i = 0; i < in.rows(); ++i) {
+		for(unsigned j = 0; j < in.cols(); ++j) {
+			auto v = in(i, j);
+			if (v > 0.) {
+				f_vals.push_back({{static_cast<real_t>(j), static_cast<real_t>(i)}, v});
+			}
+		}
+	}
+	
+	std::sort(f_vals.begin(), f_vals.end(), internal::feature_par_cmp());
+
+	if (count == -1 || static_cast<size_t>(count) >= f_vals.size())
+		count = f_vals.size();
+
+	std::vector<vec2r> features;
+	features.reserve(count);
+	for (int i = f_vals.size() - 1; i >= f_vals.size()- count; --i) {
+		features.push_back(f_vals[i].first);
+	}
+
+	return features;
+}
+
 }
 
