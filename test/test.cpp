@@ -38,6 +38,8 @@
 #include "../include/io.hpp"
 #include "../include/improc.hpp"
 #include "../include/gui.hpp"
+#include "../include/kdtree.hpp"
+#include "../include/draw.hpp"
 
 /*
 	data type test check module
@@ -130,51 +132,151 @@ void cv_matrix_test() {
 void cv_image_array_test() {
 
 	cv::image_array im = cv::imread("/home/relja/Lenna.png", cv::UINT8, 1);
-	cv::matrixr im_r = im.as_type(cv::REAL);
+	im.convert_to(cv::REAL);
 
-	cv::matrixr sobel_x = {{-1, -1, -1}, {0, 0, 0}, {1, 1, 1}};
-	cv::matrixr sobel_y = {{-1, 0, 1}, {-1, 0, 1}, {-1, 0, 1}};
+	cv::matrixr im_r, f_x, f_y, blur, f_grad;
 
-	cv::matrixr gauss_kernel = cv::gauss({5, 5});
-	gauss_kernel /= cv::norm(gauss_kernel, cv::Norm::L1);
+	im_r = im;
+	
+	cv::calc_derivatives(im_r, f_x, f_y);
 
-	std::cout << gauss_kernel << std::endl;
+	f_grad = cv::normalize(f_x + f_y);
 
-	cv::matrixr f_x, f_y, blur;
+	cv::imshow("im", im);
+	cv::imshow("gradients", f_grad);
 
-	f_x = cv::conv(im_r, sobel_x);
-	f_y = cv::conv(im_r, sobel_y);
-
-	auto f_grad = f_x + f_y;
-
-	cv::image_array im_grad = cv::normalize(f_grad);
-	im_grad.convert_to(cv::UINT8);
-
-	blur = cv::conv(im_r, gauss_kernel);
-
-	cv::image_array im_blur = blur;
-	im_blur.convert_to(cv::UINT8);
-
-	auto im_rgb = cv::imread("/home/relja/Lenna.png");
-	auto ch_rgb = im_rgb.split();
-
-	im_rgb.merge(ch_rgb);
-
-#ifndef CV_IGNORE_GUI
-	cv::imshow("lena gray", im);
-	cv::imshow("lena color", im_rgb);
-	cv::imshow("lenas edges", im_grad);
-	cv::imshow("lena blurred", im_blur);
-	std::cout << "Press any key to proceed..." << std::endl;
 	cv::wait_key();
-#endif
+
+	return;
 }
+
+void cv_gradient_test() {
+
+	cv::image_array im = cv::imread("/home/relja/Lenna.png", cv::UINT8, 1);
+	im.convert_to(cv::REAL);
+
+	cv::matrixr im_r, f_x, f_y, blur, f_grad, h, s, non_max;
+
+	im_r = im;
+
+	cv::calc_derivatives(im_r, f_x, f_y);
+
+	f_grad = cv::normalize(f_x + f_y);
+
+	h = cv::normalize(cv::harris(im_r, 3, 0.8, 1));
+	s = cv::normalize(cv::good_features(im_r, 3, 1));
+
+	non_max = s.clone();
+	cv::filter_non_maximum(non_max, 5);
+
+	cv::imshow("im", im);
+	cv::imshow("gradients", f_grad);
+	cv::imshow("harris corners", h);
+	cv::imshow("shi-tomasi corners", s);
+	cv::imshow("shi-tomasi corners non-max", non_max);
+
+	cv::wait_key();
+
+	return;
+}
+
+
+void cv_kd_tree_test() {
+
+	srand(time(NULL));
+
+	std::vector<cv::vec2i> result;
+
+	std::vector<cv::vec2i> source, results;
+	std::vector<unsigned> idResults;
+
+	for (unsigned i = 0; i < 1000; i++) {
+		cv::vec2i ptr = { rand() % 599, rand() % 599 };
+		source.push_back(ptr);
+	}
+
+	double radius = 250.0;
+	int nnCount = 6;
+
+	cv::vec2i ptr_search = { rand() % 600, rand() % 600 };
+
+	cv::kd_tree2i kd(source);
+
+	while (true) {
+
+		if (nnCount < 3) {
+			nnCount = 3;
+		}
+
+		cv::matrix3b img = cv::matrix3b::zeros(600,600);
+
+		for (unsigned i = 0; i < source.size(); i++) {
+			cv::draw_circle(img, source[i], 5, cv::vec3b{0, 0, 255});
+		}
+
+		kd.knn_index(ptr_search, nnCount, idResults, radius);
+
+		cv::draw_circle(img, ptr_search, 5, {255, 0, 0});
+		cv::draw_circle(img, ptr_search, radius, {255, 255, 0});
+
+		for (auto id : idResults) {
+				cv::draw_circle(img, source[id], 5, {0, 255, 0});
+		}
+
+		cv::imshow("KD", img);
+		char key = cv::wait_key();
+
+		switch (key) {
+		case 'q':
+			return;
+		case 'o':
+			radius += 10.0;
+			break;
+
+		case 'p':
+			radius -= 10.0;
+			break;
+		case 'k':
+			nnCount += 1;
+			break;
+		case 'l':
+			nnCount -= 1;
+			break;
+		default:
+			ptr_search = { rand() % 600, rand() % 600 };
+			break;
+		}
+	}
+}
+
+
+void cv_draw_test() {
+
+	cv::matrix3b img = cv::matrix3b::zeros(512, 512);
+
+	cv::polygoni poly;
+	poly << cv::vec2i{100, 300} << cv::vec2i{150, 200} << cv::vec2i{200, 300};
+
+	cv::draw_polygon(img, poly, {255, 0, 0}, 1, true);
+
+	//cv::draw_point(img, {256, 256}, {255, 0, 0}, 1);
+	//cv::draw_line(img, {200, 200}, {300, 250}, {0, 255, 0});
+	//cv::draw_circle(img, {256, 256}, 15, {0, 0, 255});
+
+	cv::imshow("draw image", img);
+	cv::wait_key();
+
+}
+
 
 int main() {
 
-	cv_vector_test();
-	cv_matrix_test();
-	cv_image_array_test();
+	//cv_vector_test();
+	//cv_matrix_test();
+	//cv_image_array_test();
+	//cv_gradient_test();
+	//cv_draw_test();
+	cv_kd_tree_test();
 
 	std::cout << "libcv test passed!" << std::endl;
 
