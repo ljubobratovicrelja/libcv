@@ -37,6 +37,7 @@
 #include "rangefunc.hpp"
 #include "matfunc.hpp"
 
+#include <vector>
 
 namespace cv {
 
@@ -61,6 +62,17 @@ matrixr CV_EXPORT harris(const matrixr &in, unsigned win_size = 3, real_t k = .6
  * @brief Shi-Tomasi good features to track corner detector.
  */
 matrixr CV_EXPORT good_features(const matrixr &in, unsigned win_size = 3, real_t gauss = .84);
+
+/*!
+ * @brief Extract features as 2D real points, from the corner calculated matrix of an image.
+ *
+ * @param in Matrix calculated using cv::harrs or cv::good_features functions.
+ * @param count Number of features to be extracted. Features are sorted than collected from the most strongest corner
+ * values to weakest.
+ *
+ * @return std::vector of real 2D points.
+ */
+std::vector<vec2r> CV_EXPORT extract_features(const matrixr &in, int count = -1);
 
 template<typename _Tp, size_t cnt> inline
 matrix<_Tp> color_to_gray(matrix<vectorx<_Tp, cnt> > in) {
