@@ -42,11 +42,6 @@
 
 namespace cv {
 
-enum class kd_treeSearchType {
-	VALUE,
-	INDEX
-};
-
 template<class _Tp, int dims>
 class kd_node;
 template<class _Tp, int dims, class Comparator>
