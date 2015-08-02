@@ -189,7 +189,7 @@ void adjugate(const matrix<_Tp>& in, matrix<_Tp>& adjmatrix) {
 
 template<typename _Tp>
 void resize(matrix<_Tp> in, matrix<_Tp> &out, size_t newRows, size_t newCols,
-	InterpolationType interp) {
+	InterpolationType interp = InterpolationType::LINEAR) {
 
 
 	// create out data matrix
