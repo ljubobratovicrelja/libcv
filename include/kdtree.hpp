@@ -37,7 +37,7 @@
 
 #include "fwd.hpp"
 #include "vector.hpp"
-#include "bpg.hpp"
+#include "bpq.hpp"
 
 
 namespace cv {
@@ -159,7 +159,7 @@ protected:
 			double &bestDist, int depth = 0);
 	//! Find k neighours.
 	void find_knn(const vectorx<_Tp, dims> &searchPoint, node *guess, node* curr,
-			priority_queue<node*> &bpq, size_t count, double &bestDist, int depth = 0);
+			priority_queue<node*> &bpq, unsigned count, double &bestDist, int depth = 0);
 	//! Clear _data of the kd-_tree.
 	void clear_data();
 
@@ -182,13 +182,13 @@ public:
 	//! Find nearest node for given point.
 	vectorx<_Tp, dims> nn(const vectorx<_Tp, dims> &searchPoint);
 	//! Find nearest neighours for given data.
-	void knn(const vec& searchPoint, size_t nCount,
-			std::vector<vectorx<_Tp, dims> >& outData, double maxDistance = 0.0);
+	void knn(const vec& searchPoint, unsigned nCount,
+			std::vector<vectorx<_Tp, dims> >& outData, double max_distance = 0.0);
 	//! Find nearest neighours for given data.
-	void knn_index(const vec& searchPoint, size_t nCount, std::vector<size_t>& outData, double maxDistance = 0.0);
+	void knn_index(const vec& searchPoint, unsigned nCount, std::vector<unsigned>& outData, double max_distance = 0.0);
 	//! Find nearest neighours for given data.
-	void knn_tree_node(const vec& searchPoint, size_t nCount,
-			std::vector<node*>& outData, double maxDistance = 0.0);
+	void knn_tree_node(const vec& searchPoint, unsigned nCount,
+			std::vector<node*>& outData, double max_distance = 0.0);
 	//! Get root node.
 	kd_node<_Tp, dims>* get_root_node();
 	//! Get root node.
@@ -445,7 +445,7 @@ template<class _Tp, int dims, class Comparator>
 void kd_tree<_Tp, dims, Comparator>::clear_data() {
 
     while (!_node_data.empty())
-        delete &_node_data.back(), _node_data.popBack();
+        delete &_node_data.back(), _node_data.pop_back();
 
     _tree_nodes.clear();
 }
@@ -478,19 +478,19 @@ kd_node<_Tp, dims>* kd_tree<_Tp, dims, Comparator>::build_node_from_data(
     std::sort(_data.begin(), _data.end(), Comparator(depth));
 
     // get median value.
-    int median = (_data.length() / 2);
+    int median = (_data.size() / 2);
 
     node *mNode = _data[median];
     _tree_nodes.push_back(mNode);
 
-    _data.remove(_data.begin() + median);
+    _data.erase(_data.begin() + median);
 
-    if (_data.length() > 0) {
+    if (_data.size() > 0) {
 
         // get recursively left and righ child.
         kd_node<_Tp, dims> *_l_child = build_node_from_data(_data.begin(),
-                                           _data.begin() + _data.length() / 2, depth + 1);
-        kd_node<_Tp, dims> *_r_child = build_node_from_data(_data.begin() + _data.length() / 2,
+                                           _data.begin() + _data.size() / 2, depth + 1);
+        kd_node<_Tp, dims> *_r_child = build_node_from_data(_data.begin() + _data.size() / 2,
                                             _data.end(), depth + 1);
 
         mNode->assign_left_child(_l_child);
@@ -515,7 +515,7 @@ void kd_tree<_Tp, dims, Comparator>::set_data(
     clear_data();
 	for(auto v : _data) {
         _node_data.push_back(
-            new kd_node<_Tp, dims>(*v, _node_data.length(), this));
+            new kd_node<_Tp, dims>(v, _node_data.size(), this));
     }
 }
 
@@ -535,7 +535,7 @@ void kd_tree<_Tp, dims, Comparator>::find_nn(const vectorx<_Tp, dims> &searchPoi
         if (!curr)
             return;
 
-        double currDist = searchPoint.distanceTo(curr->get_data());
+        double currDist = searchPoint.distance(curr->get_data());
 
         if (currDist < bestDist) {
             bestDist = currDist;
@@ -561,7 +561,7 @@ void kd_tree<_Tp, dims, Comparator>::find_nn(const vectorx<_Tp, dims> &searchPoi
 
 template<class _Tp, int dims, class Comparator>
 void kd_tree<_Tp, dims, Comparator>::find_knn(const vectorx<_Tp, dims> &searchPoint,
-        node *guess, node* curr, priority_queue<node*> &bpq, size_t count, double &bestDist,
+        node *guess, node* curr, priority_queue<node*> &bpq, unsigned count, double &bestDist,
         int depth) {
     if (_tree_nodes.empty())
         return;
@@ -576,7 +576,7 @@ void kd_tree<_Tp, dims, Comparator>::find_knn(const vectorx<_Tp, dims> &searchPo
         if (!curr)
             return;
 
-        double currDist = searchPoint.distanceTo(curr->get_data());
+        double currDist = searchPoint.distance(curr->get_data());
 
         bpq.enque(curr, currDist);
 
@@ -588,13 +588,13 @@ void kd_tree<_Tp, dims, Comparator>::find_knn(const vectorx<_Tp, dims> &searchPo
 
     if (searchPoint[depth] < curr->get_data()[depth]) {
         find_knn(searchPoint, guess, curr->_l_child, bpq,count, bestDist, depth + 1);
-        if (abs(curr->get_data()[depth] - searchPoint[depth]) < bpq.maxDist()) {
+        if (abs(curr->get_data()[depth] - searchPoint[depth]) < bpq.max_distance()) {
             find_knn(searchPoint, guess, curr->_r_child, bpq,count, bestDist,
                     depth + 1);
         }
     } else {
         find_knn(searchPoint, guess, curr->_r_child, bpq,count, bestDist, depth + 1);
-        if (abs(curr->get_data()[depth] - searchPoint[depth]) < bpq.maxDist()) {
+        if (abs(curr->get_data()[depth] - searchPoint[depth]) < bpq.max_distance()) {
             find_knn(searchPoint, guess, curr->_l_child, bpq,count, bestDist,
                     depth + 1);
         }
@@ -604,7 +604,7 @@ void kd_tree<_Tp, dims, Comparator>::find_knn(const vectorx<_Tp, dims> &searchPo
 template<class _Tp, int dims, class Comparator>
 vectorx<_Tp, dims> kd_tree<_Tp, dims, Comparator>::nn(
     const vectorx<_Tp, dims> &searchPoint) {
-    ASSERT(_tree_nodes.length());
+    ASSERT(_tree_nodes.size());
     node* node = nullptr;
     double bestDist = 99999999.999;
     find_nn(searchPoint, node, _tree_nodes[0], bestDist);
@@ -616,9 +616,9 @@ vectorx<_Tp, dims> kd_tree<_Tp, dims, Comparator>::nn(
 }
 
 template<class _Tp, int dims, class Comparator>
-void kd_tree<_Tp, dims, Comparator>::knn(const vec& searchPoint, size_t nCount,
-                                        std::vector<vec>& outData, double maxDistance) {
-    ASSERT(nCount > 0 && maxDistance >= 0.0 && _tree_nodes.length() != 0);
+void kd_tree<_Tp, dims, Comparator>::knn(const vec& searchPoint, unsigned nCount,
+                                        std::vector<vec>& outData, double max_distance) {
+    ASSERT(nCount > 0 && max_distance >= 0.0 && _tree_nodes.size() != 0);
     outData.clear();
 
     priority_queue<node*> bpq(nCount);
@@ -629,20 +629,20 @@ void kd_tree<_Tp, dims, Comparator>::knn(const vec& searchPoint, size_t nCount,
     LOOP_FOR_TO(nCount)
     {
         if (bpq.isPopulated(i)) {
-            if (maxDistance > 0.0) {
-                if (bpq.getScore(i) < maxDistance)
-                    outData.push_back(bpq.getValue(i)->get_data());
+            if (max_distance > 0.0) {
+                if (bpq.get_score(i) < max_distance)
+                    outData.push_back(bpq.get_value(i)->get_data());
             } else {
-                outData.push_back(bpq.getValue(i)->get_data());
+                outData.push_back(bpq.get_value(i)->get_data());
             }
         }
     }
 }
 
 template<class _Tp, int dims, class Comparator>
-void kd_tree<_Tp, dims, Comparator>::knn_index(const vec& searchPoint, size_t nCount,
-        std::vector<size_t>& outData, double maxDistance) {
-    ASSERT(nCount > 0 && maxDistance >= 0.0 && _tree_nodes.length() != 0);
+void kd_tree<_Tp, dims, Comparator>::knn_index(const vec& searchPoint, unsigned nCount,
+        std::vector<unsigned>& outData, double max_distance) {
+    ASSERT(nCount > 0 && max_distance >= 0.0 && _tree_nodes.size() != 0);
     outData.clear();
 
     priority_queue<node*> bpq(nCount);
@@ -652,20 +652,20 @@ void kd_tree<_Tp, dims, Comparator>::knn_index(const vec& searchPoint, size_t nC
 
 	for (unsigned i = 0; i < nCount; ++i) {
         if (bpq.is_populated(i)) {
-            if (maxDistance > 0.0) {
-                if (bpq.getScore(i) < maxDistance)
-                    outData.push_back(bpq.getValue(i)->get_id());
+            if (max_distance > 0.0) {
+                if (bpq.get_score(i) < max_distance)
+                    outData.push_back(bpq.get_value(i)->get_id());
             } else {
-                outData.push_back(bpq.getValue(i)->get_id());
+                outData.push_back(bpq.get_value(i)->get_id());
             }
         }
     }
 }
 
 template<class _Tp, int dims, class Comparator>
-void kd_tree<_Tp, dims, Comparator>::knn_tree_node(const vec& searchPoint, size_t nCount,
-        std::vector<node*>& outData, double maxDistance) {
-    ASSERT(nCount > 0 && maxDistance >= 0.0 && _tree_nodes.length() != 0);
+void kd_tree<_Tp, dims, Comparator>::knn_tree_node(const vec& searchPoint, unsigned nCount,
+        std::vector<node*>& outData, double max_distance) {
+    ASSERT(nCount > 0 && max_distance >= 0.0 && _tree_nodes.size() != 0);
     outData.clear();
 
     priority_queue<node*> bpq(nCount);
@@ -676,18 +676,18 @@ void kd_tree<_Tp, dims, Comparator>::knn_tree_node(const vec& searchPoint, size_
     LOOP_FOR_TO(nCount)
     {
         if (bpq.isPopulated(i)) {
-            if (maxDistance > 0.0) {
-                if (bpq.getScore(i) < maxDistance)
-                    outData.push_back(bpq.getValue(i));
+            if (max_distance > 0.0) {
+                if (bpq.get_score(i) < max_distance)
+                    outData.push_back(bpq.get_value(i));
             } else {
-                outData.push_back(bpq.getValue(i));
+                outData.push_back(bpq.get_value(i));
             }
         }
     }
 }
 template<class _Tp, int dims, class Comparator>
 kd_node<_Tp, dims>* kd_tree<_Tp, dims, Comparator>::get_root_node() {
-    return ((_tree_nodes.length()) ? _tree_nodes[0] : nullptr);
+    return ((_tree_nodes.size()) ? _tree_nodes[0] : nullptr);
 }
 
 template<class _Tp, int dims, class Comparator>
@@ -698,7 +698,7 @@ const kd_node<_Tp, dims>* kd_tree<_Tp, dims, Comparator>::get_root_node() const 
 template<class _Tp, int dims, class Comparator>
 const kd_node<_Tp, dims>* kd_tree<_Tp, dims, Comparator>::get_node(
     unsigned index) const {
-    return (_tree_nodes.length() == 0 || index >= _tree_nodes.length()) ?
+    return (_tree_nodes.size() == 0 || index >= _tree_nodes.size()) ?
            nullptr : _tree_nodes[index];
 }
 
