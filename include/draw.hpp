@@ -122,7 +122,7 @@ void draw_circle(matrix<_Tp>& mat, const vec2i& center, unsigned radius, const _
 
 template<typename _Tp>
 void draw_contour(matrix<_Tp>& mat, const contouri &contour, const _Tp & color, unsigned strokeWidth = 1) {
-	for (unsigned i = 0; i < contour.point_length(); ++i) {
+	for (unsigned i = 1; i < contour.point_length(); ++i) {
 		draw_line(mat, contour[i - 1], contour[i], color, strokeWidth);
 	}
 }
