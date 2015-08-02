@@ -43,64 +43,8 @@
 #include "fwd.hpp"
 #include "image.hpp"
 
-#include <QtCore/QtCore>
-#include <QtGui/QtGui>
-
-#ifdef WIN32
-// TODO: integrate qt include files in thirdParty directory.
-#include <QtWidgets/QDialog>
-#include <QtWidgets/QKeyEvent>
-#include <QtWidgets/QCloseEvent>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QBoxLayout>
-#else
-#include <QtGui/QDialog>
-#include <QtGui/QKeyEvent>
-#include <QtGui/QCloseEvent>
-#include <QtGui/QLabel>
-#include <QtGui/QBoxLayout>
-#include <QtGui/QApplication>
-#endif
-
 
 namespace cv {
-
-class CV_EXPORT image_window : public QDialog {
-	Q_OBJECT
-private:
-	QLabel *image_lbl;
-public:
-	explicit image_window(QWidget *parent = nullptr);
-	~image_window();
-
-	void set_image(const image_array &image);
-
-	virtual void keyPressEvent(QKeyEvent *e);
-	virtual void closeEvent(QCloseEvent *c);
-};
-
-class CV_EXPORT global_image_application: public QApplication {
-private:
-	static global_image_application* _singleton;
-	std::vector<image_window*> _windows;
-	bool _force_quit;
-	char _last_key;
-
-	global_image_application(int &argc, char** argv);
-public:
-	~global_image_application();
-
-	static global_image_application *singleton();
-
-	void force_quit();
-	void assign_key(char key);
-	char get_last_key() const;
-
-	void create_window(const std::string &name, const image_array &image);
-	void destroy_window(const std::string &name);
-	void destroy_all_windows();
-};
 
 void CV_EXPORT imshow(const std::string &name, const image_array &image);
 void CV_EXPORT imclose(const std::string &name);
