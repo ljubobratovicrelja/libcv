@@ -40,6 +40,9 @@
 #include "../include/gui.hpp"
 #include "../include/kdtree.hpp"
 #include "../include/draw.hpp"
+#include "../include/linalg.hpp"
+#include "../include/math.hpp"
+
 
 /*
 	data type test check module
@@ -83,7 +86,7 @@ void cv_vector_test() {
 	ASSERT(&vec_cpy[0] != &st_vec[0]);
 
 	// distance ------------------------------
-	
+
 	cv::vector<int> a = {1, 2};
 	cv::vector<int> b = {1, 3};
 
@@ -137,7 +140,7 @@ void cv_image_array_test() {
 	cv::matrixr im_r, f_x, f_y, blur, f_grad;
 
 	im_r = im;
-	
+
 	cv::calc_derivatives(im_r, f_x, f_y);
 
 	f_grad = cv::normalize(f_x + f_y);
@@ -211,7 +214,7 @@ void cv_kd_tree_test() {
 		cv::matrix3b img = cv::matrix3b::zeros(600,600);
 
 		for (unsigned i = 0; i < source.size(); i++) {
-			cv::draw_circle(img, source[i], 5, cv::vec3b{0, 0, 255});
+			cv::draw_circle(img, source[i], 5, cv::vec3b {0, 0, 255});
 		}
 
 		kd.knn_index(ptr_search, nnCount, idResults, radius);
@@ -220,7 +223,7 @@ void cv_kd_tree_test() {
 		cv::draw_circle(img, ptr_search, radius, {255, 255, 0});
 
 		for (auto id : idResults) {
-				cv::draw_circle(img, source[id], 5, {0, 255, 0});
+			cv::draw_circle(img, source[id], 5, {0, 255, 0});
 		}
 
 		cv::imshow("KD", img);
@@ -249,25 +252,112 @@ void cv_kd_tree_test() {
 	}
 }
 
-
 void cv_draw_test() {
 
 	cv::matrix3b img = cv::matrix3b::zeros(512, 512);
 
 	cv::polygoni poly;
-	poly << cv::vec2i{100, 300} << cv::vec2i{150, 200} << cv::vec2i{200, 300};
+	poly << cv::vec2i {100, 300} << cv::vec2i {150, 200} << cv::vec2i {200, 300};
 
 	cv::draw_polygon(img, poly, {255, 0, 0}, 1, true);
-
-	//cv::draw_point(img, {256, 256}, {255, 0, 0}, 1);
-	//cv::draw_line(img, {200, 200}, {300, 250}, {0, 255, 0});
-	//cv::draw_circle(img, {256, 256}, 15, {0, 0, 255});
+	cv::draw_point(img, {256, 256}, {255, 0, 0}, 1);
+	cv::draw_line(img, {200, 200}, {300, 250}, {0, 255, 0});
+	cv::draw_circle(img, {256, 256}, 15, {0, 0, 255});
 
 	cv::imshow("draw image", img);
 	cv::wait_key();
 
 }
 
+void cv_linalg_test() {
+
+	// inverse test /////////////////////////////////////////////////////////////////////////////////
+	cv::matrixr mat = {{32, 4, 5}, {1, 32, 4}, {31, 54, 54}};
+
+	auto inv = mat.clone();
+
+	cv::invert(inv);
+
+	auto one_mat = mat * inv;
+
+	// is identity ?
+	ASSERT(cv::is_aproximation(one_mat(0, 0), static_cast<real_t>(1.0), static_cast<real_t>(10e-6)));
+	ASSERT(cv::is_aproximation(one_mat(1, 1), static_cast<real_t>(1.0), static_cast<real_t>(10e-6)));
+	ASSERT(cv::is_aproximation(one_mat(2, 2), static_cast<real_t>(1.0), static_cast<real_t>(10e-6)));
+
+	ASSERT(cv::is_aproximation(one_mat(0, 1), static_cast<real_t>(.0), static_cast<real_t>(10e-6)));
+	ASSERT(cv::is_aproximation(one_mat(0, 2), static_cast<real_t>(.0), static_cast<real_t>(10e-6)));
+	ASSERT(cv::is_aproximation(one_mat(1, 0), static_cast<real_t>(.0), static_cast<real_t>(10e-6)));
+
+	ASSERT(cv::is_aproximation(one_mat(1, 2), static_cast<real_t>(.0), static_cast<real_t>(10e-6)));
+	ASSERT(cv::is_aproximation(one_mat(2, 0), static_cast<real_t>(.0), static_cast<real_t>(10e-6)));
+	ASSERT(cv::is_aproximation(one_mat(2, 1), static_cast<real_t>(.0), static_cast<real_t>(10e-6)));
+
+	// inverse test end /////////////////////////////////////////////////////////////////////////////
+
+	// lu decomposition test ////////////////////////////////////////////////////////////////////////
+	cv::matrixr L, U, P;
+
+	mat = {{7, 3, -11}, {-6, 7, 10}, {-11, 2, -2}};
+
+	cv::lu_decomp(mat, L, U, P);
+
+	auto comp_res = (P*L*U);
+
+	ASSERT(std::memcmp((void*)mat.data(), (void*)comp_res.data(), 9*sizeof(real_t)));
+
+	// lu decomposition test end ////////////////////////////////////////////////////////////////////
+
+	// svd decomposition test ///////////////////////////////////////////////////////////////////////
+
+	cv::matrixr S, Vt;
+
+	cv::svd_decomp(mat, U, S, Vt);
+
+	comp_res = (U*S*Vt);
+	ASSERT(std::memcmp((void*)mat.data(), (void*)comp_res.data(), 9*sizeof(real_t)));
+
+	// svd decomposition test end ///////////////////////////////////////////////////////////////////
+
+	// system solving : LU
+
+	cv::matrixr a = {
+		{6.80 , -6.05 , -0.45 ,  8.32 , -9.67},
+		{-2.11,  -3.30,   2.58,   2.71,  -5.14},
+		{5.66 ,  5.36 , -2.70 ,  4.35 , -7.26},
+		{5.97 , -4.44 ,  0.27 , -7.17 ,  6.08},
+		{8.23 ,  1.08 ,  9.04 ,  2.14 , -6.87}
+	};
+
+	cv::matrixr b = {
+		{4.02 , -1.56 ,  9.81},
+		{6.19 ,  4.00 , -4.09},
+		{-8.22,  -8.67,  -4.57},
+		{-7.57,   1.75,  -8.61},
+		{-3.03,   2.86,   8.99}
+	};
+
+	cv::matrixr correct_solution = {
+		{-0.800714, -0.389621, 0.955465 },
+		{-0.695243, -0.554427, 0.22066 },
+		{0.593915 ,0.842227, 1.90064 },
+		{1.32173 ,-0.103802 ,5.35766 },
+		{0.565756 ,0.105711 ,4.0406 }
+	};
+
+	cv::matrixr x;
+
+	cv::lu_solve(a, b, x);
+
+	std::cout << correct_solution << std::endl;
+	std::cout << x << std::endl;
+	
+	for(unsigned i = 0; i < correct_solution.rows(); ++i) {
+		for(unsigned j = 0; j < correct_solution.cols(); ++j) {
+			ASSERT(cv::cmp_real(correct_solution(i, j), x(i, j)));
+		}
+	}
+}
 
 int main() {
 
@@ -276,9 +366,14 @@ int main() {
 	//cv_image_array_test();
 	//cv_gradient_test();
 	//cv_draw_test();
-	cv_kd_tree_test();
+	//cv_kd_tree_test();
+	cv_linalg_test();
 
 	std::cout << "libcv test passed!" << std::endl;
 
 	return EXIT_SUCCESS;
 }
+
+
+
+
