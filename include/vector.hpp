@@ -262,8 +262,11 @@ public:
 	operator bool() const;
 	//! Stream operator.
 	friend std::ostream& operator<<(std::ostream& stream, const vector<_Tp> &arr) {
-		for (int i = 0; i < arr.length(); i++) {
-			stream << arr[i] << " ";
+		if (arr.empty())
+			return stream;
+		stream << arr[0];
+		for (unsigned i = 1; i < arr.length(); i++) {
+			stream << " " << arr[i];
 		}
 		return stream;
 	}
@@ -280,6 +283,7 @@ public:
  */
 template<class _Tp, unsigned _size>
 class vectorx {
+	static_assert(_size > 0, "Size of the vector has to be at least 1");
 public:
 	typedef random_access_iterator<_Tp> iterator;  //!< random access iterator.
 	typedef random_access_iterator<const _Tp> const_iterator; //!< read-only random access iterator.
@@ -407,8 +411,9 @@ public:
 
 	//! ostream operator.
 	friend std::ostream& operator<<(std::ostream& stream, const vectorx<_Tp, _size> &arr) {
-		for (int i = 0; i < _size; i++) {
-			stream << arr[i] << " ";
+		stream << arr[0];
+		for (unsigned i = 1; i < _size; i++) {
+			stream <<" " << arr[i];
 		}
 		return stream;
 	}
