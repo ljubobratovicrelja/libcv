@@ -5,7 +5,9 @@ cmake_minimum_required(VERSION 2.8)
 file(GLOB SRC_FILES "./src/*.cpp")
 file(GLOB INC_FILES "./include/*.hpp")
 
-set(CMAKE_CXX_FLAGS "-std=c++11 -w -g -O0 -fopenmp")
+set(CMAKE_CXX_FLAGS "-std=c++11 -fopenmp -w")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG")
 
 if (WIN32)
 	# to be changed so it can compile on msc
@@ -26,9 +28,8 @@ set(DOUBLE_REAL TRUE CACHE BOOL "Should the real type be double(true) or float(f
 
 
 add_library(${OUT_LIB_NAME} SHARED ${SRC_FILES})
-target_link_libraries("cv" "png")
+target_link_libraries("cv" "png" "lapacke" "lapack" "blas")
 target_link_libraries("cv" Qt4::QtGui Qt4::QtCore)
-
 
 add_executable("test" "./test/test.cpp")
 target_link_libraries("test" "cv")
