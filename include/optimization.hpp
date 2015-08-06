@@ -55,7 +55,7 @@ typedef void (*optimization_fcn)(int *m, int *n, double *x, double *fvec, int *i
 /*!
  * @brief Wrapper structure for convinient use of minpacks lmdif1 routine.
  */
-int lmdif1(optimization_fcn fcn, int m, int n, double *x, double *fvec, double tol = 10e-16);
+int lmdif1(optimization_fcn fcn, int m, int n, double *x, double tol = 10e-16);
 
 }
 
