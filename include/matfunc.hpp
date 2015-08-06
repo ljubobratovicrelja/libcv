@@ -428,7 +428,7 @@ matrix<_Tp> normalize(const matrix<_Tp> &in, Norm ntype = Norm::MINMAX, real_t l
 }
 
 template<typename _Tp>
-_Tp distance(const matrix<_Tp> &m1, const matrix<_Tp> &m2, Norm ntype = Norm::L2) {
+real_t distance(const matrix<_Tp> &m1, const matrix<_Tp> &m2, Norm ntype = Norm::L2) {
 	ASSERT(m1.size() == m2.size());
 	return norm(m1 - m2, ntype);
 }
