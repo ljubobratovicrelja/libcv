@@ -31,8 +31,6 @@
 #define OPTIMIZATION_HPP_YPHLDAFR
 
 
-#include <minpack.h>
-
 #include "matrix.hpp"
 #include "vector.hpp"
 
