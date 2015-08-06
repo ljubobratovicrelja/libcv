@@ -349,6 +349,90 @@ _Tp mean(const matrix<_Tp> &in) {
 	return sum(in) / (in.rows() * in.cols());
 }
 
+template<typename _Tp>
+real_t norm(const matrix<_Tp> &in, Norm ntype = Norm::L2) {
+	ASSERT(in);
+
+	real_t n = 0;
+
+	switch(ntype) {
+		case Norm::INF:
+			n = std::numeric_limits<real_t>::min();
+			for (unsigned i = 0; i < in.rows(); ++i) {
+				for (unsigned j = 0; j < in.cols(); ++j) {
+					if (in(i, j) > n) {
+						n = in(i, j);
+					}
+				}
+			}
+			break;
+		case Norm::L1:
+			for (unsigned i = 0; i < in.rows(); ++i) {
+				for (unsigned j = 0; j < in.cols(); ++j) {
+					n += std::fabs(in(i, j));
+				}
+			}
+			break;
+		case Norm::L2:
+			for (unsigned i = 0; i < in.rows(); ++i) {
+				for (unsigned j = 0; j < in.cols(); ++j) {
+					n += std::pow(in(i, j), 2);
+				}
+			}
+			n = std::sqrt(n);
+			break;
+		default:
+			throw std::runtime_error("Unsupported norm type - should be L1 - or L2");
+	}
+
+	return n;
+}
+
+template<typename _Tp>
+matrix<_Tp> normalize(const matrix<_Tp> &in, Norm ntype = Norm::MINMAX, real_t lowv = 0., real_t hiv = 255.) {
+	ASSERT(in);
+
+	matrix<_Tp> out(in.size());
+
+	if (ntype == Norm::MINMAX) {
+		auto min = std::numeric_limits<real_t>::max();
+		auto max = std::numeric_limits<real_t>::min();
+		for (unsigned i = 0; i < in.rows(); ++i) {
+			for (unsigned j = 0; j < in.cols(); ++j) {
+				auto v = in(i, j);
+				if (v > max)
+					max = v;
+				if (v < min)
+					min = v;
+			}
+		}
+		real_t sc_val = ((hiv - lowv) / (max - min)) + lowv;
+		for (unsigned i = 0; i < in.rows(); ++i) {
+			for (unsigned j = 0; j < in.cols(); ++j) {
+				out(i, j) = (in(i, j) - min) * sc_val;
+			}
+		}
+	} else if (ntype == Norm::L2 || ntype == Norm::L1 || ntype == Norm::INF) {
+
+		auto normVal = norm(in, ntype);
+
+		for (unsigned i = 0; i < in.rows(); ++i) {
+			for (unsigned j = 0; j < in.cols(); ++j) {
+				out(i, j) = in(i, j) / normVal;
+			}
+		}
+	} else {
+		throw std::runtime_error("Norm type not supported.");
+	}
+	return out;
+}
+
+template<typename _Tp>
+_Tp distance(const matrix<_Tp> &m1, const matrix<_Tp> &m2, Norm ntype = Norm::L2) {
+	ASSERT(m1.size() == m2.size());
+	return norm(m1 - m2, ntype);
+}
+
 }
 
 #endif /* end of include guard: MATFUNC_HPP_PV3OUXCZ */
