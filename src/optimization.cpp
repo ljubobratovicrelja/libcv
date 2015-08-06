@@ -30,14 +30,15 @@
 
 namespace cv {
 
-int lmdif1(optimization_fcn fcn, int m, int n, double *x, double *fvec, double tol) {
-	ASSERT(m > n && x && fvec && tol > std::numeric_limits<double>::min());
+int lmdif1(optimization_fcn fcn, int m, int n, double *x, double tol) {
+	ASSERT(m > n && x && tol > std::numeric_limits<double>::min());
 
 	int info = 0;
 
-	auto *iwa = new int[n];
-	auto lwa = (m*n)+(5*n)+m+10;
-	auto *wa = new double[lwa];
+	auto iwa = new int[n];
+	int lwa = (m*n)+(5*n)+m+10;
+	auto wa = new double[lwa];
+	auto fvec = new double[m];
 
 	lmdif1_(fcn, &m, &n, x, fvec, &tol, &info, iwa, wa, &lwa);
 
