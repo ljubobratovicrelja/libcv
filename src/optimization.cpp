@@ -25,6 +25,8 @@
 
 #include "../include/optimization.hpp"
 
+#include <minpack.h>
+
 #include <limits>
 
 
