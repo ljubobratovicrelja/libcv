@@ -467,16 +467,51 @@ typedef point2i point;
 typedef vec3b color3;
 typedef vec4b color4;
 
+typedef vector<int> vectori; //!< 32-bit int vector
+typedef vector<unsigned> vectorui; //!< 32-bit unsigned int vector
+typedef vector<float> vectorf; //!< 32-bit float vector.
+typedef vector<double> vectord; //!< 64-bit float vector.
+typedef vector<unsigned char> vectorb; //!< 8-bit unsigned char vector (byte).
+typedef vector<short> vectors; //!< 16-bit short vector.
+
+typedef vector<vec2d> vector2d; //!< Two channel 64-bit double vector
+typedef vector<vec2i> vector2i; //!< Two channel 32-bit int vector
+typedef vector<vec2f> vector2f; //!< Two channel 32-bit float vector
+typedef vector<vec2s> vector2s; //!< Two channel 16-bit short vector
+typedef vector<vec2b> vector2b; //!< Two channel 8-bit byte vector
+
+typedef vector<vec3d> vector3d; //!< Three channel 64-bit double vector
+typedef vector<vec3i> vector3i; //!< Three channel 32-bit int vector
+typedef vector<vec3f> vector3f; //!< Three channel 32-bit float vector
+typedef vector<vec3s> vector3s; //!< Three channel 16-bit short vector
+typedef vector<vec3b> vector3b; //!< Three channel 8-bit byte vector
+
+typedef vector<vec4d> vector4d; //!< Four channel 64-bit double vector
+typedef vector<vec4i> vector4i; //!< Four channel 32-bit int vector
+typedef vector<vec4f> vector4f; //!< Four channel 32-bit float vector
+typedef vector<vec4s> vector4s; //!< Four channel 16-bit short vector
+typedef vector<vec4b> vector4b; //!< Four channel 8-bit byte vector
+
 #ifdef CV_REAL_TYPE_DOUBLE
 typedef vec2d vec2r;
 typedef vec3d vec3r;
 typedef vec4d vec4r;
 typedef vec6d vec6r;
+
+typedef vectord vectorr;
+typedef vector2d vector2r;
+typedef vector3d vector3r;
+typedef vector4d vector4r;
 #else
 typedef vec2f vec2r;
 typedef vec3f vec3r;
 typedef vec4f vec4r;
 typedef vec6f vec6r;
+
+typedef vectorf vectorr;
+typedef vector2f vector2r;
+typedef vector3f vector3r;
+typedef vector4f vector4r;
 #endif
 
 // Implementation
@@ -1248,11 +1283,13 @@ bool vectorx<_Tp, _size>::operator <(const vectorx<_Tp, _size>& rhs) const {
 
 template<class _Tp, unsigned _size>
 _Tp& vectorx<_Tp, _size>::operator[](unsigned index) {
+	ASSERT(index < _size);
 	return this->_data[index];
 }
 
 template<class _Tp, unsigned _size>
 const _Tp& vectorx<_Tp, _size>::operator[](unsigned index) const {
+	ASSERT(index < _size);
 	return this->_data[index];
 }
 
