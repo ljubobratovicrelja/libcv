@@ -28,7 +28,7 @@ set(DOUBLE_REAL TRUE CACHE BOOL "Should the real type be double(true) or float(f
 
 
 add_library(${OUT_LIB_NAME} SHARED ${SRC_FILES})
-target_link_libraries("cv" "png" "lapacke" "lapack" "blas")
+target_link_libraries("cv" "png" "lapacke" "lapack" "blas" "minpack")
 target_link_libraries("cv" Qt4::QtGui Qt4::QtCore)
 
 add_executable("test" "./test/test.cpp")
