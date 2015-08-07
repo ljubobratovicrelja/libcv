@@ -31,10 +31,12 @@
 namespace cv {
 
 index_array::index_array() : _size(INDEX_ARRAY_SIZE) {
+	std::memset(_data, 0, sizeof(unsigned)*_size);
 }
 
 index_array::index_array(unsigned size) : _size(size) {
     ASSERT(size <= INDEX_ARRAY_SIZE);
+	std::memset(_data, 0, sizeof(unsigned)*_size);
 }
 
 index_array::index_array(const std::initializer_list<unsigned> &list) {
