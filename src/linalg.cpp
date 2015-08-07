@@ -492,4 +492,22 @@ int rodrigues_solve(const matrixr &src, matrixr &dst, matrixr *jacobian) {
 	return 1;
 }
 
+void decompose_eigenvector_matrix(matrixr ev_mat, std::vector<vectorr> &evs, bool normalize) {
+	ASSERT(ev_mat && ev_mat.is_square());
+	evs.clear();
+	for (unsigned i = 0; i < ev_mat.cols(); ++i) {
+		evs.push_back(ev_mat.col(i));
+		if (normalize) {
+			evs.back() *= 1. / evs.back()[0];
+		}
+	}
+}
+
+vectorr get_eigenvector(matrixr ev_mat, unsigned eig_val_idx, bool normalize) {
+	ASSERT(ev_mat && eig_val_idx < ev_mat.cols());
+	auto ev = ev_mat.col(eig_val_idx);
+	if (normalize)
+		ev *= 1. / ev[0];
+	return ev;
+}
 }

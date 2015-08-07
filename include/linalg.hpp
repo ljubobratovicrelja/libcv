@@ -36,6 +36,14 @@
 #include "matfunc.hpp"
 
 
+#ifndef CV_AUTO_NORM_EIGENVECTORS
+#define CV_AUTO_NORM_EIGENVECTORS 0
+#else
+#if (CV_AUTO_NORM_EIGENVECTORS != 1 && CV_AUTO_NORM_EIGENVECTORS != 0)
+#error "CV_AUTO_NORM_EIGENVECTORS has to be 1 or 0"
+#endif
+#endif
+
 namespace cv {
 /*!
  * @brief Compute the inverse of a matrix using the LU	factorization.
@@ -164,6 +172,30 @@ void CV_EXPORT geev(const matrixr &in, vector<real_t> &wr, vector<real_t> &wi, m
  *
  */
 int CV_EXPORT rodrigues_solve(const matrixr &src, matrixr &dst, matrixr *jacobian);
+
+/*!
+ * @brief Decomposes eigenvector matrix from geev to individual vectors 
+ * associated to each eigenvalue.
+ *
+ * @warning
+ * Each eigen vector references matrix data.
+ *
+ * @param ev_mat eigenvalue matrix achieved from geev.
+ * @param evs std::vector of cv::vectorr where individual vector columns will be stored.
+ * @param normalize if true, vectors will be normalized by the first member to be 1.0.
+ */
+void CV_EXPORT decompose_eigenvector_matrix(matrixr ev_mat, std::vector<vectorr> &evs, bool normalize = CV_AUTO_NORM_EIGENVECTORS);
+
+/*!
+ * @brief Get eigenvalue associated with indexed eigenvalue.
+ *
+ * @param ev_mat eigenvalue matrix achieved from geev.
+ * @param eig_val_idx index of the eigenvalue - column of the ev_mat.
+ * @param normalize if true, vectors will be normalized by the first member to be 1.0.
+ *
+ * @throws if eig_val_idx is >= ev_mat.cols(), throws std::runtime_error.
+ */
+vectorr CV_EXPORT get_eigenvector(matrixr ev_mat, unsigned eig_val_idx, bool normalize = CV_AUTO_NORM_EIGENVECTORS);
 
 }
 #endif /* end of include guard: LINALG_HPP_YW7IEDT1 */
