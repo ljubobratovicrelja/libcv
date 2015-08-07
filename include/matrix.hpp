@@ -309,6 +309,7 @@ matrix<_Tp>& matrix<_Tp>::operator=(matrix<_Tp> &&m) {
 template<typename _Tp>
 void matrix<_Tp>::create(unsigned rows, unsigned cols) {
 	this->release();
+	this->_refcount = REF_NEW;
 	this->allocate({rows, cols});
 }
 
