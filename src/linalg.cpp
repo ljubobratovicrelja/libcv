@@ -34,7 +34,7 @@ extern "C" {
 
 namespace cv {
 
-#ifdef CV_REAL_TYPE_DOUBLE_
+#ifdef CV_REAL_TYPE_DOUBLE
 #define cv_getrf LAPACKE_dgetrf
 #define cv_getri LAPACKE_dgetri
 #define cv_gesvd LAPACKE_dgesvd
