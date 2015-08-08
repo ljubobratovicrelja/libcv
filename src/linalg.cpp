@@ -225,7 +225,7 @@ void lu_solve(const matrixr &A, const matrixr &B, matrixr &X) {
 	delete[] piv;
 }
 
-void null_solve(const matrixr &in, matrixr &nullSpace) {
+void null_solve(const matrixr &in, matrixr &nullSpace, bool normalize) {
 	ASSERT(in);
 
 	matrixr U, S, Vt;
@@ -243,7 +243,8 @@ void null_solve(const matrixr &in, matrixr &nullSpace) {
 		nullSpace(i, 0) = Vt(i, Vt.cols() - 1);
 	}
 
-	nullSpace *= 1 / Vt(Vt.rows() - 1, Vt.cols() - 1);
+	if(normalize)
+		nullSpace *= 1 / Vt(Vt.rows() - 1, Vt.cols() - 1);
 }
 
 void gemm(const matrixr &A, const matrixr &B, matrixr &C, real_t alpha, real_t beta) {
