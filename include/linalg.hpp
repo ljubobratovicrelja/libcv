@@ -103,7 +103,7 @@ void CV_EXPORT lu_solve(const matrixr &A, const matrixr &B, matrixr &X);
  * @param in Input matrix of arbitrary size.
  * @param nullSpace Null-space of the input matrix.
  */
-void CV_EXPORT null_solve(const matrixr &in, matrixr &nullSpace);
+void CV_EXPORT null_solve(const matrixr &in, matrixr &nullSpace, bool normalize = CV_AUTO_NORM_EIGENVECTORS);
 
 /*!
  * @brief Perform general matrix multiplication.
