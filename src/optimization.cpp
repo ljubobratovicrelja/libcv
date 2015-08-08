@@ -44,6 +44,10 @@ int lmdif1(optimization_fcn fcn, int m, int n, double *x, double tol) {
 
 	lmdif1_(fcn, &m, &n, x, fvec, &tol, &info, iwa, wa, &lwa);
 
+	delete [] iwa;
+	delete [] wa;
+	delete [] fvec;
+
 	return info;
 }
 
