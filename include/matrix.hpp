@@ -663,12 +663,16 @@ matrix<_Tp>::operator matrix<_Up>() const {
 
 template<typename _Tp>
 std::ostream& operator<<(std::ostream& stream, const matrix<_Tp>& mat) {
+	auto p = stream.precision();
+	stream << std::fixed;
+	stream.precision(5);
 	for (int i = 0; i < mat.rows(); i++) {
 		for (int j = 0; j < mat.cols(); j++) {
 			stream << mat(i, j) << " ";
 		}
 		stream << std::endl;
 	}
+	stream.precision(p);
 	return stream;
 }
 
