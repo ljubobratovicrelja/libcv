@@ -206,6 +206,11 @@ public:
 	//! Fill vector with given value.
 	void fill(const _Tp &value);
 
+	//! Calculate dot product.
+	_Tp dot(const vector<_Tp> &rhs) const;
+	//! Calculate cross product for 2 and 3 dimensional vector.
+	vector<_Tp> cross(const vector<_Tp> &rhs) const;
+
 	//! Calculate norm of the vector.
 	real_t norm(Norm n = Norm::L2) const;
 	//! Calculate distance of two vectors. Need to be of same size.
@@ -707,6 +712,31 @@ void vector<_Tp>::fill(const _Tp &value) {
 			v = value;
 		}
 	}
+}
+
+template<class _Tp>
+_Tp vector<_Tp>::dot(const vector<_Tp> &rhs) const {
+	ASSERT(this->length() == rhs.length());
+	_Tp d = 0;
+	for (unsigned i = 0; i < this->length(); ++i) {
+		d += this->_data[i] * rhs[i];
+	}
+	return d;
+}
+
+template<class _Tp>
+vector<_Tp> vector<_Tp>::cross(const vector<_Tp> &rhs) const {
+	ASSERT(this->length() == rhs.length() && (this->length() == 2 || this->length() == 3));
+	vector<_Tp> c;
+	if (this->length() == 2) {
+		c[0] = (*this)[0] - rhs[1];
+		c[1] =  rhs[0] - (*this)[1];
+	} else {
+		c[0] = (*this)[1]*rhs[2] - (*this)[2]*rhs[1];
+		c[1] = -1*((*this)[0]*rhs[2] - (*this)[2]*rhs[0]);
+		c[2] = (*this)[0]*rhs[1] - (*this)[1]*rhs[0];
+	}
+	return c;
 }
 
 template<class _Tp>
