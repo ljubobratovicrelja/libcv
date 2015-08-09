@@ -130,6 +130,23 @@ void cv_matrix_test() {
 	cv::matrix3f mat_3f(3, 3);
 	mat_3f.fill({255, 15, 354});
 	std::cout << mat_3f << std::endl;
+
+	cv::vectori v = {1, 2, 3, 4};
+	cv::matrixi mat_from_vector = v;
+
+	ASSERT(v.data() ==	mat_from_vector.data());
+	ASSERT(mat_from_vector.rows() == 1 && mat_from_vector.cols() == v.length());
+
+	std::cout << "Mat from vector:\n" << mat_from_vector << std::endl;
+	
+	cv::vec3i vx = {1, 2, 3};
+	cv::matrixi mat_from_vectorx = vx;
+
+	std::cout << mat_from_vectorx.size() << std::endl;
+
+	ASSERT(mat_from_vectorx.rows() == 1 && mat_from_vectorx.cols() == 3);
+
+	std::cout << "Mat from vectorx:\n" << mat_from_vectorx << std::endl;
 }
 
 void cv_image_array_test() {
@@ -362,12 +379,12 @@ void cv_linalg_test() {
 int main() {
 
 	//cv_vector_test();
-	//cv_matrix_test();
+	cv_matrix_test();
 	//cv_image_array_test();
 	//cv_gradient_test();
 	//cv_draw_test();
 	//cv_kd_tree_test();
-	cv_linalg_test();
+	//cv_linalg_test();
 
 	std::cout << "libcv test passed!" << std::endl;
 
