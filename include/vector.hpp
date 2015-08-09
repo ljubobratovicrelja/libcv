@@ -727,7 +727,7 @@ _Tp vector<_Tp>::dot(const vector<_Tp> &rhs) const {
 template<class _Tp>
 vector<_Tp> vector<_Tp>::cross(const vector<_Tp> &rhs) const {
 	ASSERT(this->length() == rhs.length() && (this->length() == 2 || this->length() == 3));
-	vector<_Tp> c;
+	vector<_Tp> c(this->length());
 	if (this->length() == 2) {
 		c[0] = (*this)[0] - rhs[1];
 		c[1] =  rhs[0] - (*this)[1];
