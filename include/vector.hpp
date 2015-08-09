@@ -1257,7 +1257,9 @@ vectorx<_Tp, _size> vectorx<_Tp, _size>::cross(const vectorx<_Tp, _size> &rhs) c
 		c[0] = this->_data[0] - rhs._data[1];
 		c[1] =  rhs._data[0] - this->_data[1];
 	} else {
-		throw std::runtime_error("3D cross product is not yet implemented");
+		c[0] = this->_data[1]*rhs._data[2] - this->_data[2]*rhs._data[1];
+		c[1] = -1*(this->_data[0]*rhs._data[2] - this->_data[2]*rhs._data[0]);
+		c[2] = this->_data[0]*rhs._data[1] - this->_data[1]*rhs._data[0];
 	}
 	return c;
 }
