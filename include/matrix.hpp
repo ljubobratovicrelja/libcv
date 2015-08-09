@@ -78,9 +78,9 @@ class matrix: public basic_array < _Tp > {
 	//! Copy constructor.
 	matrix(const matrix<_Tp> &m, bool deep_copy = false);
 	//! Constructor from cv::vector
-	matrix(const vector<_Tp> &v, bool deep_copy = false);
+	matrix(const vector<_Tp> &v, bool transposed = false, bool deep_copy = false);
 	//! Constructor from 3D cv::vectorx
-	matrix(const vectorx<_Tp, 3> &v);
+	matrix(const vectorx<_Tp, 3> &v, bool transposed = false);
 	//! Constructor from 4D cv::vectorx
 	matrix(const vectorx<_Tp, 4> &v);
 	//! Move constructor.
@@ -291,26 +291,38 @@ matrix<_Tp>::matrix(const matrix<_Tp> &m, bool deep_copy):
 }
 
 template<typename _Tp>
-matrix<_Tp>::matrix(const vector<_Tp> &v, bool deep_copy):
+matrix<_Tp>::matrix(const vector<_Tp> &v, bool transposed, bool deep_copy):
 	super_type() {
 		if (deep_copy) {
 			this->_refcount = REF_NEW;
-			this->allocate({1, v.length()});
+
+			if (transposed)
+				this->allocate({v.length(), 1});
+			else
+				this->allocate({1, v.length()});
+
 			std::copy(v.begin(), v.end(), this->_begin);
 		} else {
 			this->_data = v.data();
 			this->_begin = v.data_begin();
 			this->_refcount = v.refcounter();
 			REF_INCREMENT(this->_refcount);
-			this->_shape = {1, v.length()};
+			if (transposed) {
+				this->_shape = { v.length(), 1};
+			} else {
+				this->_shape = {1, v.length()};
+			}
 			this->_strides = {v.strides()[0]*v.length(), v.strides()[0]};
 		}
 }
 
 template<typename _Tp>
-matrix<_Tp>::matrix(const vectorx<_Tp, 3> &v): super_type() {
+matrix<_Tp>::matrix(const vectorx<_Tp, 3> &v, bool transposed): super_type() {
 	this->_refcount = REF_NEW;
-	this->allocate({1, 3});
+	if (transposed)
+		this->allocate({3, 1});
+	else
+		this->allocate({1, 3});
 	std::copy(v.begin(), v.end(), this->_data);
 }
 
@@ -626,7 +638,7 @@ vector<_Tp> matrix<_Tp>::row(unsigned i) {
 
 template<typename _Tp>
 vector<_Tp> matrix<_Tp>::col(unsigned i) {
-	ASSERT(i < this->rows());
+	ASSERT(i < this->cols());
 	return vector<_Tp>(this->_data, this->_begin + i*this->_strides[1], this->rows(), this->_strides[0], this->_refcount);
 }
 
