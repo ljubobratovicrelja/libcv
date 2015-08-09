@@ -76,7 +76,13 @@ class matrix: public basic_array < _Tp > {
 	//! Class constructor.
 	matrix(pointer data, pointer begin, const index_array &shape, const index_array &strides, refcount_type *refcounter);
 	//! Copy constructor.
-	matrix(const matrix<_Tp> &m, bool deepCopy = false);
+	matrix(const matrix<_Tp> &m, bool deep_copy = false);
+	//! Constructor from cv::vector
+	matrix(const vector<_Tp> &v, bool deep_copy = false);
+	//! Constructor from 3D cv::vectorx
+	matrix(const vectorx<_Tp, 3> &v);
+	//! Constructor from 4D cv::vectorx
+	matrix(const vectorx<_Tp, 4> &v);
 	//! Move constructor.
 	matrix(matrix<_Tp> &&m);
 
@@ -280,8 +286,39 @@ matrix<_Tp>::matrix(pointer data, pointer begin, const index_array &shape, const
 }
 
 template<typename _Tp>
-matrix<_Tp>::matrix(const matrix<_Tp> &m, bool deepCopy):
-	super_type(m, deepCopy) {
+matrix<_Tp>::matrix(const matrix<_Tp> &m, bool deep_copy):
+	super_type(m, deep_copy) {
+}
+
+template<typename _Tp>
+matrix<_Tp>::matrix(const vector<_Tp> &v, bool deep_copy):
+	super_type() {
+		if (deep_copy) {
+			this->_refcount = REF_NEW;
+			this->allocate({1, v.length()});
+			std::copy(v.begin(), v.end(), this->_begin);
+		} else {
+			this->_data = v.data();
+			this->_begin = v.data_begin();
+			this->_refcount = v.refcounter();
+			REF_INCREMENT(this->_refcount);
+			this->_shape = {1, v.length()};
+			this->_strides = {v.strides()[0]*v.length(), v.strides()[0]};
+		}
+}
+
+template<typename _Tp>
+matrix<_Tp>::matrix(const vectorx<_Tp, 3> &v): super_type() {
+	this->_refcount = REF_NEW;
+	this->allocate({1, 3});
+	std::copy(v.begin(), v.end(), this->_data);
+}
+
+template<typename _Tp>
+matrix<_Tp>::matrix(const vectorx<_Tp, 4> &v): super_type() {
+	this->_refcount = REF_NEW;
+	this->allocate({1, 4});
+	std::copy(v.begin(), v.end(), this->_data);
 }
 
 template<typename _Tp>
@@ -729,11 +766,10 @@ matrix<_Tp> operator*(const matrix<_Tp>& lhs, const matrix<_Tp>& rhs) {
 		for (int c = 0; c < rhs.rows(); c++) {
 			retVal(i, j) += lhs(i, c) * rhs(c, j);
 		}
-
 	}
-
 	return retVal;
 }
+
 
 //! Addition operator.
 template<typename _Tp>
