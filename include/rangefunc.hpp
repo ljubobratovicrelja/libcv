@@ -52,10 +52,10 @@ real_t norm(const_iterator begin, const_iterator end, Norm ntype) {
 	real_t nv = 0;
 	switch (ntype) {
 		case Norm::L1:
-			do nv += *begin; while (++begin < end);
+			do nv += *begin; while (++begin != end);
 			break;
 		case Norm::L2:
-			do nv += pow(*begin, 2); while (++begin < end);
+			do nv += pow(*begin, 2); while (++begin != end);
 			nv = sqrtf(nv);
 			break;
 		default:
@@ -67,7 +67,7 @@ real_t norm(const_iterator begin, const_iterator end, Norm ntype) {
 template<typename iterator>
 void normalize(iterator begin, iterator end, Norm ntype) {
 	auto nv = norm(begin, end, ntype);
-	do *begin /= nv; while (++begin < end);
+	do *begin /= nv; while (++begin != end);
 }
 
 }
