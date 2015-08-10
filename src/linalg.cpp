@@ -199,7 +199,15 @@ matrixr svd_decomp(const matrixr &A, matrixr &U, matrixr &S, matrixr &VT) {
 
 void lu_solve(const matrixr &A, const matrixr &B, matrixr &X) {
 
-	ASSERT(A && B && A.is_square() && A.cols() == B.rows());
+	ASSERT(A && B);
+
+	if (!A.is_square()) {
+		auto At = A.transposed();
+		lu_solve(At*A, At*B, X);
+		return;
+	}
+
+	ASSERT(A.cols() == B.rows());
 
 	matrixr aWork = A.clone();
 	X = B.clone();
