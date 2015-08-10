@@ -91,6 +91,10 @@ matrixr CV_EXPORT svd_decomp(const matrixr &A, matrixr &U, matrixr &S,
  * A * X = B or A' * X = B with a general N-by-N matrix
  * A using	the LU factorization.
  *
+ * @note
+ * if matrix A is not square, system will perform:
+ * At*A*X = At*B
+ *
  * Uses lapack dgesv/sgesv
  *
  * \throws std::runtime_error
