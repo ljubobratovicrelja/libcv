@@ -43,6 +43,9 @@ index_array::index_array(const std::initializer_list<unsigned> &list) {
     ASSERT(list.size() <= INDEX_ARRAY_SIZE);
     this->_size = list.size();
     std::copy(list.begin(), list.end(), _data);
+	if (list.size() < INDEX_ARRAY_SIZE) {
+		std::memset(_data + list.size(), 0, (INDEX_ARRAY_SIZE - list.size())*sizeof(unsigned));
+	}
 }
 
 unsigned index_array::size() const {
