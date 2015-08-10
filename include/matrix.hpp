@@ -312,7 +312,7 @@ matrix<_Tp>::matrix(const vector<_Tp> &v, bool transposed, bool deep_copy):
 			} else {
 				this->_shape = {1, v.length()};
 			}
-			this->_strides = {v.strides()[0]*v.length(), v.strides()[0]};
+			this->_strides = {v.strides()[0]*this->_shape[1], v.strides()[0]};
 		}
 }
 
