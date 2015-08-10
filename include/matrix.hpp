@@ -784,11 +784,9 @@ matrix<_Tp> operator*(const matrix<_Tp>& lhs, const matrix<_Tp>& rhs) {
 
 template<typename _Tp>
 vector<_Tp> operator*(const matrix<_Tp>& lhs, const vector<_Tp>& rhs) {
-	ASSERT(lhs.rows() == rhs.length() || lhs.cols() == rhs.length());
-	bool transposed = (lhs.rows() == rhs.length()) ? true : false;
-	
+	ASSERT(lhs.cols() == rhs.length());
 	cv::matrix<_Tp> res;
-	cv::matrix<_Tp> rhs_m(rhs, transposed);
+	cv::matrix<_Tp> rhs_m(rhs, true);
 	res = lhs * rhs_m;
 
 	return vector<_Tp>(res.data(),res.data_begin(), res.shape().product(), 1, res.refcounter());
@@ -796,11 +794,9 @@ vector<_Tp> operator*(const matrix<_Tp>& lhs, const vector<_Tp>& rhs) {
 
 template<typename _Tp>
 vectorx<_Tp, 3> operator*(const matrix<_Tp>& lhs, const vectorx<_Tp, 3>& rhs) {
-	ASSERT(lhs.rows() == 3 || lhs.cols() == 3);
-	bool transposed = (lhs.rows() == 3) ? true : false;
-	
+	ASSERT(lhs.cols() == 3);
 	cv::matrix<_Tp> res;
-	cv::matrix<_Tp> rhs_m(rhs, transposed);
+	cv::matrix<_Tp> rhs_m(rhs, true);
 	res = lhs * rhs_m;
 
 	return vectorx<_Tp, 3>(res.data()[0], res.data()[1], res.data()[2]);
@@ -808,24 +804,22 @@ vectorx<_Tp, 3> operator*(const matrix<_Tp>& lhs, const vectorx<_Tp, 3>& rhs) {
 
 template<typename _Tp>
 vector<_Tp> operator*(const vector<_Tp>& lhs, const matrix<_Tp>& rhs) {
-	ASSERT(rhs.rows() == lhs.length() || rhs.cols() == lhs.length());
-	bool transposed = (rhs.cols() == lhs.length()) ? true : false;
+	ASSERT(rhs.rows() == lhs.length());
 	
 	cv::matrix<_Tp> res;
-	cv::matrix<_Tp> rhs_m(lhs, transposed);
-	res = lhs * rhs_m;
+	cv::matrix<_Tp> rhs_m(lhs);
+	res = rhs_m * rhs;
 
 	return vector<_Tp>(res.data(),res.data_begin(), res.shape().product(), 1, res.refcounter());
 }
 
 template<typename _Tp>
 vectorx<_Tp, 3> operator*(const vectorx<_Tp, 3>& lhs, const matrix<_Tp>& rhs) {
-	ASSERT(lhs.rows() == 3 || lhs.cols() == 3);
-	bool transposed = (lhs.cols() == 3) ? true : false;
+	ASSERT(rhs.rows() == 3);
 	
 	cv::matrix<_Tp> res;
-	cv::matrix<_Tp> rhs_m(rhs, transposed);
-	res = lhs * rhs_m;
+	cv::matrix<_Tp> rhs_m(rhs);
+	res = rhs_m * rhs;
 
 	return vectorx<_Tp, 3>(res.data()[0], res.data()[1], res.data()[2]);
 }
