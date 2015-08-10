@@ -625,11 +625,6 @@ vector<_Tp>::operator vector<_Up>() const {
 
 template<class _Tp>
 vector<_Tp> vector<_Tp>::operator()(unsigned start, unsigned end, unsigned stride) {
-	ASSERT(this->length());
-
-	start = INTERPRET_INDEX(start, this->length());
-	end = INTERPRET_INDEX(end, this->length());
-
 	ASSERT(start <= end && start < this->length() && start >= 0 && end < this->length() && end >= 0);
 
 	vector<_Tp> vec;
@@ -648,11 +643,6 @@ vector<_Tp> vector<_Tp>::operator()(unsigned start, unsigned end, unsigned strid
 
 template<class _Tp>
 const vector<_Tp> vector<_Tp>::operator()(unsigned start, unsigned end, unsigned stride) const {
-	ASSERT(this->length());
-
-	start = INTERPRET_INDEX(start, this->length());
-	end = INTERPRET_INDEX(end, this->length());
-
 	ASSERT(start <= end && start < this->length() && start >= 0 && end < this->length() && end >= 0);
 
 	vector<_Tp> vec;
