@@ -51,9 +51,14 @@ namespace cv {
 typedef void (*optimization_fcn)(int *m, int *n, double *x, double *fvec, int *iflag);
 
 /*!
+ * @brief Wrapper structure for convinient use of minpacks lmdif routine.
+ */
+int CV_EXPORT lmdif(optimization_fcn fcn, int m, int n, double *x, int maxfev = 400, double ftol = 1e-08, double xtol=1e-08, 
+		double gtol=1e-08, double epsfcn=1e-08);
+/*!
  * @brief Wrapper structure for convinient use of minpacks lmdif1 routine.
  */
-int lmdif1(optimization_fcn fcn, int m, int n, double *x, double tol = 10e-16);
+int CV_EXPORT lmdif1(optimization_fcn fcn, int m, int n, double *x, double tol = 10e-16);
 
 }
 
