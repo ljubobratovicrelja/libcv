@@ -145,6 +145,12 @@ class matrix: public basic_array < _Tp > {
 	*/
 	vector<_Tp> col(unsigned i);
 
+	//! Get read-only i-th row.
+	const vector<_Tp> row(unsigned i) const;
+
+	//! Get read-only i-th column.
+	const vector<_Tp> col(unsigned i) const;
+
 	/*!
 	* @brief Fill all members with given value.
 	*/
@@ -162,7 +168,7 @@ class matrix: public basic_array < _Tp > {
 	//! Get mutable data end iterator.
 	iterator end();
 	//! Get immutable data begin iterator.
-	const_iterator begin() const; 
+	const_iterator begin() const;
 	//! Get immutable data begin iterator.
 	const_iterator end() const;
 	//!Swap two matrix item values.
@@ -257,6 +263,7 @@ matrix<_Tp>::matrix(const std::initializer_list<std::initializer_list<_Tp> > &m)
 	ASSERT(m.size() && m.begin()->size());
 	unsigned r = m.size();
 	unsigned c = m.begin()->size();
+	this->_refcount = REF_NEW;
 	this->allocate({r, c});
 	auto i_iter = m.begin();
 	for (unsigned i = 0; i < m.size(); ++i, ++i_iter) {
@@ -274,13 +281,13 @@ matrix<_Tp>::matrix(vec2i size):
 }
 
 template<typename _Tp>
-matrix<_Tp>::matrix(unsigned rows, unsigned cols, pointer data, refcount_type *refcounter) : 
+matrix<_Tp>::matrix(unsigned rows, unsigned cols, pointer data, refcount_type *refcounter) :
 	super_type(data, data, {rows, cols}, {cols, 1}, refcounter) {
 	ASSERT(rows && cols && data);
 }
 
 template<typename _Tp>
-matrix<_Tp>::matrix(pointer data, pointer begin, const index_array &shape, const index_array &strides, refcount_type *refcount) : 
+matrix<_Tp>::matrix(pointer data, pointer begin, const index_array &shape, const index_array &strides, refcount_type *refcount) :
 	super_type(data, begin, shape, strides, refcount) {
 	ASSERT(data && begin && shape.size() == 2 && strides.size() == 2);
 }
@@ -293,27 +300,27 @@ matrix<_Tp>::matrix(const matrix<_Tp> &m, bool deep_copy):
 template<typename _Tp>
 matrix<_Tp>::matrix(const vector<_Tp> &v, bool transposed, bool deep_copy):
 	super_type() {
-		if (deep_copy) {
-			this->_refcount = REF_NEW;
+	if (deep_copy) {
+		this->_refcount = REF_NEW;
 
-			if (transposed)
-				this->allocate({v.length(), 1});
-			else
-				this->allocate({1, v.length()});
+		if (transposed)
+			this->allocate({v.length(), 1});
+		else
+			this->allocate({1, v.length()});
 
-			std::copy(v.begin(), v.end(), this->_begin);
+		std::copy(v.begin(), v.end(), this->_begin);
+	} else {
+		this->_data = v.data();
+		this->_begin = v.data_begin();
+		this->_refcount = v.refcounter();
+		REF_INCREMENT(this->_refcount);
+		if (transposed) {
+			this->_shape = { v.length(), 1};
 		} else {
-			this->_data = v.data();
-			this->_begin = v.data_begin();
-			this->_refcount = v.refcounter();
-			REF_INCREMENT(this->_refcount);
-			if (transposed) {
-				this->_shape = { v.length(), 1};
-			} else {
-				this->_shape = {1, v.length()};
-			}
-			this->_strides = {v.strides()[0]*this->_shape[1], v.strides()[0]};
+			this->_shape = {1, v.length()};
 		}
+		this->_strides = {v.strides()[0]*this->_shape[1], v.strides()[0]};
+	}
 }
 
 template<typename _Tp>
@@ -643,6 +650,18 @@ vector<_Tp> matrix<_Tp>::col(unsigned i) {
 }
 
 template<typename _Tp>
+const vector<_Tp> matrix<_Tp>::row(unsigned i) const {
+	ASSERT(i < this->rows());
+	return vector<_Tp>(this->_data, this->_begin + i*this->_strides[0], this->cols(), this->_strides[1], this->_refcount);
+}
+
+template<typename _Tp>
+const vector<_Tp> matrix<_Tp>::col(unsigned i) const {
+	ASSERT(i < this->cols());
+	return vector<_Tp>(this->_data, this->_begin + i*this->_strides[1], this->rows(), this->_strides[0], this->_refcount);
+}
+
+template<typename _Tp>
 matrix<_Tp> matrix<_Tp>::clone() const {
 	return matrix<_Tp>(*this, true);
 }
@@ -805,7 +824,7 @@ vectorx<_Tp, 3> operator*(const matrix<_Tp>& lhs, const vectorx<_Tp, 3>& rhs) {
 template<typename _Tp>
 vector<_Tp> operator*(const vector<_Tp>& lhs, const matrix<_Tp>& rhs) {
 	ASSERT(rhs.rows() == lhs.length());
-	
+
 	cv::matrix<_Tp> res;
 	cv::matrix<_Tp> rhs_m(lhs);
 	res = rhs_m * rhs;
@@ -816,7 +835,7 @@ vector<_Tp> operator*(const vector<_Tp>& lhs, const matrix<_Tp>& rhs) {
 template<typename _Tp>
 vectorx<_Tp, 3> operator*(const vectorx<_Tp, 3>& lhs, const matrix<_Tp>& rhs) {
 	ASSERT(rhs.rows() == 3);
-	
+
 	cv::matrix<_Tp> res;
 	cv::matrix<_Tp> rhs_m(rhs);
 	res = rhs_m * rhs;
@@ -979,6 +998,7 @@ matrix<_Tp> &operator%=(matrix<_Tp> &lhs, double rhs) {
 }
 
 #endif /* end of include guard: MATRIX_HPP_AEUQVFPW */
+
 
 
 
