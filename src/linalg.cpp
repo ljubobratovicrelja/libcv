@@ -102,7 +102,7 @@ size_t rank(const matrixr &matrix) {
 
 void lu_decomp(const matrixr &A, matrixr &L, matrixr &U, matrixr &P) {
 
-	ASSERT(A);
+	ASSERT(A && A.is_square());
 
 	int rows = A.rows();
 	int cols = A.rows();
@@ -160,7 +160,7 @@ matrixr svd_decomp(const matrixr &A, matrixr &U, matrixr &S, matrixr &VT) {
 	int d = std::min(m, n);
 	int info;
 
-	matrixr modifA(A);
+	matrixr modifA(A, true);
 
 	real_t *a = modifA.data();
 
