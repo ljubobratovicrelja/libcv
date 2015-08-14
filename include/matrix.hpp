@@ -79,10 +79,8 @@ class matrix: public basic_array < _Tp > {
 	matrix(const matrix<_Tp> &m, bool deep_copy = false);
 	//! Constructor from cv::vector
 	matrix(const vector<_Tp> &v, bool transposed = false, bool deep_copy = false);
-	//! Constructor from 3D cv::vectorx
-	matrix(const vectorx<_Tp, 3> &v, bool transposed = false);
-	//! Constructor from 4D cv::vectorx
-	matrix(const vectorx<_Tp, 4> &v);
+	//! Constructor from nD cv::vectorx
+	template<unsigned _size> matrix(const vectorx<_Tp, _size> &v, bool transposed = false);
 	//! Move constructor.
 	matrix(matrix<_Tp> &&m);
 
@@ -324,19 +322,13 @@ matrix<_Tp>::matrix(const vector<_Tp> &v, bool transposed, bool deep_copy):
 }
 
 template<typename _Tp>
-matrix<_Tp>::matrix(const vectorx<_Tp, 3> &v, bool transposed): super_type() {
+template< unsigned _size>
+matrix<_Tp>::matrix(const vectorx<_Tp, _size> &v, bool transposed): super_type() {
 	this->_refcount = REF_NEW;
 	if (transposed)
-		this->allocate({3, 1});
+		this->allocate({_size, 1});
 	else
-		this->allocate({1, 3});
-	std::copy(v.begin(), v.end(), this->_data);
-}
-
-template<typename _Tp>
-matrix<_Tp>::matrix(const vectorx<_Tp, 4> &v): super_type() {
-	this->_refcount = REF_NEW;
-	this->allocate({1, 4});
+		this->allocate({1,_size});
 	std::copy(v.begin(), v.end(), this->_data);
 }
 
@@ -811,14 +803,19 @@ vector<_Tp> operator*(const matrix<_Tp>& lhs, const vector<_Tp>& rhs) {
 	return vector<_Tp>(res.data(),res.data_begin(), res.shape().product(), 1, res.refcounter());
 }
 
-template<typename _Tp>
-vectorx<_Tp, 3> operator*(const matrix<_Tp>& lhs, const vectorx<_Tp, 3>& rhs) {
-	ASSERT(lhs.cols() == 3);
+template<typename _Tp, unsigned _size>
+vectorx<_Tp, _size> operator*(const matrix<_Tp>& lhs, const vectorx<_Tp, _size>& rhs) {
+	ASSERT(lhs.cols() == _size);
 	cv::matrix<_Tp> res;
 	cv::matrix<_Tp> rhs_m(rhs, true);
 	res = lhs * rhs_m;
 
-	return vectorx<_Tp, 3>(res.data()[0], res.data()[1], res.data()[2]);
+	vectorx<_Tp, _size> ret_vec;
+	for (unsigned i = 0; i < _size; ++i) {
+		ret_vec[i] = res.data()[i];
+	}
+
+	return ret_vec;
 }
 
 template<typename _Tp>
@@ -832,15 +829,19 @@ vector<_Tp> operator*(const vector<_Tp>& lhs, const matrix<_Tp>& rhs) {
 	return vector<_Tp>(res.data(),res.data_begin(), res.shape().product(), 1, res.refcounter());
 }
 
-template<typename _Tp>
-vectorx<_Tp, 3> operator*(const vectorx<_Tp, 3>& lhs, const matrix<_Tp>& rhs) {
-	ASSERT(rhs.rows() == 3);
+template<typename _Tp, unsigned _size> vectorx<_Tp, _size> operator*(const vectorx<_Tp, _size>& lhs, const matrix<_Tp>& rhs) {
+	ASSERT(rhs.rows() == _size);
 
 	cv::matrix<_Tp> res;
-	cv::matrix<_Tp> rhs_m(rhs);
+	cv::matrix<_Tp> rhs_m(lhs);
 	res = rhs_m * rhs;
 
-	return vectorx<_Tp, 3>(res.data()[0], res.data()[1], res.data()[2]);
+	vectorx<_Tp, _size> ret_vec;
+	for (unsigned i = 0; i < _size; ++i) {
+		ret_vec[i] = res.data()[i];
+	}
+
+	return ret_vec;
 }
 
 //! Addition operator.
