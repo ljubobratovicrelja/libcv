@@ -94,14 +94,14 @@ double determinant(const matrix<_Tp>& in) {
 		for (unsigned int col = 1; col < in.cols() + 1; col++) {
 
 			minor_matrix(in, minorImage, 0, col - 1);
-			det += pow(-1, (double)(col)) * in.get(0, col - 1) * determinant(minorImage);
+			det += pow(-1, (double)(col)) * in(0, col - 1) * determinant(minorImage);
 
 		}
 
 	} else if (minorImage.rows() == 2) {
-		det = minorImage.get(0, 0) * minorImage.get(1, 1) - minorImage.get(1, 0) * minorImage.get(0, 1);
+		det = minorImage(0, 0) * minorImage(1, 1) - minorImage(1, 0) * minorImage(0, 1);
 	} else if (minorImage.rows() == 1) {
-		det = minorImage.get(0, 0);
+		det = minorImage(0, 0);
 	}
 
 	return det;
@@ -124,7 +124,7 @@ void minor_matrix(const matrix<_Tp>& in, matrix<_Tp>& minormatrix, unsigned int 
 	for (unsigned i = 0; i < in.rows(); i++) {
 		for (unsigned j = 0; j < in.cols(); j++) {
 			if (i != row && j != col) {
-				minormatrix(detR, detC) = in.get(i, j);
+				minormatrix(detR, detC) = in(i, j);
 				detC++;
 			}
 		}
