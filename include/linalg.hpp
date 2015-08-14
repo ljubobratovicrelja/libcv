@@ -175,7 +175,7 @@ void CV_EXPORT geev(const matrixr &in, vector<real_t> &wr, vector<real_t> &wi, m
  * \throws std::runtime_error.
  *
  */
-int CV_EXPORT rodrigues_solve(const matrixr &src, matrixr &dst, matrixr *jacobian);
+int CV_EXPORT rodrigues_solve(const matrixr &src, matrixr &dst, matrixr *jacobian = nullptr);
 
 /*!
  * @brief Decomposes eigenvector matrix from geev to individual vectors 
