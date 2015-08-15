@@ -34,6 +34,7 @@ extern "C" {
 #include <pngconf.h>
 #include <pnglibconf.h>
 #endif
+#include <jpeglib.h>
 }
 
 
@@ -282,14 +283,150 @@ bool writePng(const cv::image_array &buffer, const std::string &path) {
 	return true;
 }
 
+struct my_error_mgr {
+	struct jpeg_error_mgr pub; /* "public" fields */
+
+	jmp_buf setjmp_buffer; /* for return to caller */
+};
+
+typedef struct my_error_mgr * my_error_ptr;
+METHODDEF(void)
+
+my_error_exit(j_common_ptr cinfo) {
+	/* cinfo->err really points to a my_error_mgr struct, so coerce pointer */
+	my_error_ptr myerr = (my_error_ptr) cinfo->err;
+
+	/* Always display the message. */
+	/* We could postpone this until after returning, if we chose. */
+	(*cinfo->err->output_message)(cinfo);
+
+	/* Return control to the setjmp point */
+	longjmp(myerr->setjmp_buffer, 1);
+}
+
+bool loadJpeg(image_array &buff, const std::string &filename) {
+
+	struct jpeg_decompress_struct cinfo;
+	struct my_error_mgr jerr;
+
+	FILE * infile; /* source file */
+	JSAMPARRAY buffer; /* Output row buffer */
+	int row_stride; /* physical row width in output buffer */
+
+	if ((infile = fopen(filename.c_str(), "rb")) == NULL) {
+		fprintf(stderr, "can't open %s\n", filename.c_str());
+		return false;
+	}
+
+	cinfo.err = jpeg_std_error(&jerr.pub);
+	jerr.pub.error_exit = my_error_exit;
+
+	if (setjmp(jerr.setjmp_buffer)) {
+		jpeg_destroy_decompress(&cinfo);
+		fclose(infile);
+		return false;
+	}
+
+	jpeg_create_decompress(&cinfo);
+	jpeg_stdio_src(&cinfo, infile);
+	(void) jpeg_read_header(&cinfo, TRUE);
+	(void) jpeg_start_decompress(&cinfo);
+	row_stride = cinfo.output_width * cinfo.output_components;
+	buffer = (*cinfo.mem->alloc_sarray)((j_common_ptr) &cinfo, JPOOL_IMAGE, row_stride, 1);
+
+	buff.create(cinfo.output_height, cinfo.output_width, cinfo.output_components, cv::UINT8);
+	byte *buff_data = buff.data_begin();
+
+	while (cinfo.output_scanline < cinfo.output_height) {
+		(void) jpeg_read_scanlines(&cinfo, buffer, 1);
+
+		memcpy(buff_data, buffer[0], row_stride);
+		buff_data += row_stride;
+	}
+
+	(void) jpeg_finish_decompress(&cinfo);
+	jpeg_destroy_decompress(&cinfo);
+
+	fclose(infile);
+
+	return true;
+}
+
+bool writeJpeg(const image_array &image, const std::string &filename) {
+	int quality = 100;
+
+	image_array buff;
+
+	if (buff.is_contiguous())
+		buff = image;
+	else
+		buff = image.clone();
+
+	struct jpeg_compress_struct cinfo;
+
+	struct jpeg_error_mgr jerr;
+
+	FILE * outfile; /* target file */
+	JSAMPROW row_pointer[1]; /* pointer to JSAMPLE row[s] */
+	int row_stride; /* physical row width in image buffer */
+
+	cinfo.err = jpeg_std_error(&jerr);
+	jpeg_create_compress(&cinfo);
+
+	if ((outfile = fopen(filename.c_str(), "wb")) == NULL) {
+		fprintf(stderr, "can't open %s\n", filename.c_str());
+		return false;
+	}
+	jpeg_stdio_dest(&cinfo, outfile);
+
+	cinfo.image_width = buff.cols(); /* image width and height, in pixels */
+	cinfo.image_height = buff.rows();
+	cinfo.input_components = buff.channels(); /* # of color components per pixel */
+	cinfo.in_color_space = JCS_RGB; /* colorspace of input image */
+	byte *image_buffer = buff.data_begin();
+
+	jpeg_set_defaults(&cinfo);
+	jpeg_set_quality(&cinfo, quality, TRUE /* limit to baseline-JPEG values */);
+	jpeg_start_compress(&cinfo, TRUE);
+	row_stride = buff.cols() * buff.channels(); /* JSAMPLEs per row in image_buffer */
+
+	while (cinfo.next_scanline < cinfo.image_height) {
+		row_pointer[0] = &image_buffer[cinfo.next_scanline * row_stride];
+		(void) jpeg_write_scanlines(&cinfo, row_pointer, 1);
+	}
+
+	jpeg_finish_compress(&cinfo);
+	fclose(outfile);
+
+	jpeg_destroy_compress(&cinfo);
+
+	return true;
+}
 
 bool imwrite(const image_array &image, const std::string &path) {
-	return writePng(image, path);
+	std::string ext = path.substr(path.find_last_of(".") + 1);
+	for (auto &s : ext) { s = std::tolower(s);	}
+
+	if (ext == "png") 
+		return writePng(image, path);
+	else if (ext == "jpg" || ext == "jpeg")
+		return writeJpeg(image, path);
+	else 
+		throw std::runtime_error("Image format not supported - only png and jpg supported so far.");
 }
 
 image_array CV_EXPORT imread(const std::string &path, data_type dtype, unsigned channels) {
 	image_array im;
-	loadPng(im, path);
+
+	std::string ext = path.substr(path.find_last_of(".") + 1);
+	for (auto &s : ext) { s = std::tolower(s);	}
+
+	if (ext == "png") 
+		loadPng(im, path);
+	else if (ext == "jpg" || ext == "jpeg")
+		loadJpeg(im, path);
+	else 
+		throw std::runtime_error("Image format not supported - only png and jpg supported so far.");
 
 	if (!im)
 		return im;
