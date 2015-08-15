@@ -153,6 +153,7 @@ void image_array::create(unsigned rows, unsigned cols, unsigned channels, data_t
     this->_dtype = dtype;
     ASSERT(dtype != NONE);
     this->allocate({rows, cols, channels}, internal::data_size[dtype]);
+	this->_refcount = REF_NEW;
 }
 
 image_array image_array::clone() const {
