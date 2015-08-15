@@ -224,7 +224,12 @@ public:
      */
     template<typename _Tp>
     operator matrix<_Tp>() const {
-        ASSERT(this->is_valid() && sizeof(_Tp) == this->depth()*this->channels());
+		if (!this->is_valid()) {
+			return matrix<_Tp>(); // if this is an empty image array, return corresponding empty matrix.
+		}
+
+        ASSERT(sizeof(_Tp) == this->depth()*this->channels());
+
 		auto data = reinterpret_cast<_Tp*>(this->_data);
 		auto begin = reinterpret_cast<_Tp*>(this->_begin);
 		auto shape = this->_shape;
@@ -232,6 +237,7 @@ public:
 		shape.resize(2);
 		strides.resize(2);
 		strides /= sizeof(_Tp);
+
         return matrix<_Tp>(data, begin, shape, strides, this->_refcount);
     }
 
