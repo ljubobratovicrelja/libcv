@@ -17,7 +17,7 @@ endif(NOT WIN32)
 find_package(Qt4 REQUIRED)
 
 include_directories("/usr/include/qt4")
-link_directories("/usr/lib" "/usr/local/lib")
+link_directories("/usr/lib" "/usr/local/lib" "/usr/lib/x86_64-linux-gnu")
 
 # Project variables
 set(OUT_LIB_NAME "cv")
@@ -28,7 +28,7 @@ set(DOUBLE_REAL TRUE CACHE BOOL "Should the real type be double(true) or float(f
 
 
 add_library(${OUT_LIB_NAME} SHARED ${SRC_FILES})
-target_link_libraries("cv" "png" "lapacke" "lapack" "blas" "minpack")
+target_link_libraries("cv" "png" "lapacke" "lapack" "blas" "minpack" "cminpack" "jpeg")
 target_link_libraries("cv" Qt4::QtGui Qt4::QtCore)
 
 add_executable("test" "./test/test.cpp")
