@@ -26,6 +26,7 @@
 #include "../include/optimization.hpp"
 
 #include <minpack.h>
+#include <cminpack.h>
 
 #include <limits>
 
@@ -36,30 +37,41 @@ int lmdif(optimization_fcn fcn, int m, int n, double *x, int maxfev, double ftol
 
 	ASSERT(m > n && x);
 
-	double* fvec=new double[m]; //no need to populate
+	double* fvec=new double[m]; 
 
-	int mode=1; //some internal thing
-	double factor=1; // a default recommended value
-	int nprint=0; //don't know what it does
-	int info=0; //output variable
-	int nfev=0; //output variable will store no. of function evals
+	int mode=1;
+	double factor=1;
+	int info=0; 
+	int nfev=0; 
 
-	double* diag=new double[n]; //some internal thing
-	double* fjac=new double[m*n]; //output array of jacobian
+	double* diag=new double[n]; 
+	double** fjac=new double*[m]; 
 
-	int ldfjac=m; //recommended setting
-	int* ipvt=new int[n]; //for internal use
+	for (int i = 0; i < n; ++i) { fjac[i] = new double[n]; }
 
-	double* qtf=new double[n]; //for internal use
-	double* wa1=new double[n]; //for internal use
-	double* wa2=new double[n]; //for internal use
-	double* wa3=new double[n]; //for internal use
-	double* wa4=new double[m]; //for internal use
+	int* ipvt=new int[n]; 
 
-	lmdif_(fcn, &m, &n, x, fvec,  &ftol,
-	       &xtol, &gtol, &maxfev, &epsfcn, diag,  &mode,  &factor,
-	       &nprint,  &info, &nfev, fjac, &ldfjac, ipvt, qtf,
-	       wa1, wa2, wa3, wa4);
+	double* qtf=new double[n]; 
+	int *msk = new int[n];
+	double* wa1=new double[n]; 
+	double* wa2=new double[n]; 
+	double* wa3=new double[n]; 
+	double* wa4=new double[m]; 
+
+	::lmdif(fcn, m, n, x, msk, fvec, ftol, xtol, gtol, maxfev, epsfcn, diag, mode, factor, &info, &nfev,
+			fjac, ipvt, qtf, wa1, wa2, wa3, wa4);
+
+	for (int i = 0; i < n; ++i) { delete [] fjac[i]; }
+
+	delete [] fvec;
+	delete [] diag;
+	delete [] msk;
+	delete [] fjac;
+	delete [] qtf;
+	delete [] wa1;
+	delete [] wa2;
+	delete [] wa3;
+	delete [] wa4;
 
 	return info;
 }
@@ -69,19 +81,18 @@ int lmdif1(optimization_fcn fcn, int m, int n, double *x, double tol) {
 
 	int info = 0;
 
-	auto iwa = new int[n];
-	int lwa = (m*n)+(5*n)+m+10;
-	auto wa = new double[lwa];
-	auto fvec = new double[m];
+	int     *msk = new int[n];
+	double  *fvec = new double[m];
+	int     nfev;
 
-	lmdif1_(fcn, &m, &n, x, fvec, &tol, &info, iwa, wa, &lwa);
+	::lmdif0(fcn, m,n,x,msk,fvec,tol,&info,&nfev);
 
-	delete [] iwa;
-	delete [] wa;
 	delete [] fvec;
+	delete [] msk;
 
 	return info;
 }
 
 }
+
 
