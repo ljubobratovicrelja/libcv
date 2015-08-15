@@ -184,6 +184,9 @@ std::vector<vec2r> extract_features(const matrixr &in, int count) {
 			}
 		}
 	}
+
+	if (f_vals.empty())
+		return std::vector<vec2r>();
 	
 	std::sort(f_vals.begin(), f_vals.end(), internal::feature_par_cmp());
 
