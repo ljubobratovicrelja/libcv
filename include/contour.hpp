@@ -73,11 +73,9 @@ class contour {
 	//! Constructor using range of points.
 	template<typename point_iterator>
 	contour(point_iterator begin, point_iterator end) :
-		_pts() {
-		auto dist = std::distance(begin, end);
-		ASSERT(dist);
-		this->_pts.create(begin, end);
+		_pts(begin, end) {
 	}
+
 	//! Constructor using initializer list of points.
 	contour(std::initializer_list<point_type> list) :
 		_pts(list) {
@@ -200,6 +198,10 @@ class contour {
 			}
 		}
 		return regiond(min[0], min[1], max[0] - min[0], max[1] - min[1]);
+	}
+
+	contour operator()(iterator begin, iterator end) const {
+		return contour(begin, end);
 	}
 
 	point_reference operator[](unsigned index) {
