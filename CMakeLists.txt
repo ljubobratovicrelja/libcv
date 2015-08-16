@@ -2,10 +2,10 @@
 project(libcv)
 cmake_minimum_required(VERSION 2.8)
 
-file(GLOB SRC_FILES "./src/*.cpp")
-file(GLOB INC_FILES "./include/*.hpp")
+file(GLOB SRC_FILES "./src/*.c*")
+file(GLOB INC_FILES "./include/*.h*")
 
-set(CMAKE_CXX_FLAGS "-std=c++11 -fopenmp -w -DCV_REAL_TYPE_DOUBLE")
+set(CMAKE_CXX_FLAGS "-std=c++11 -O3 -fopenmp -w -DCV_REAL_TYPE_DOUBLE")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG")
 
@@ -28,7 +28,7 @@ set(DOUBLE_REAL TRUE CACHE BOOL "Should the real type be double(true) or float(f
 
 
 add_library(${OUT_LIB_NAME} SHARED ${SRC_FILES})
-target_link_libraries("cv" "png" "lapacke" "lapack" "blas" "minpack" "cminpack" "jpeg")
+target_link_libraries("cv" "png" "lapacke" "lapack" "blas" "jpeg")
 target_link_libraries("cv" Qt4::QtGui Qt4::QtCore)
 
 add_executable("test" "./test/test.cpp")
