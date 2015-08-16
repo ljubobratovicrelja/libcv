@@ -5,14 +5,24 @@ cmake_minimum_required(VERSION 2.8)
 file(GLOB SRC_FILES "./src/*.c*")
 file(GLOB INC_FILES "./include/*.h*")
 
-set(CMAKE_CXX_FLAGS "-std=c++11 -O3 -fopenmp -w -DCV_REAL_TYPE_DOUBLE")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG")
+set(CMAKE_CXX_FLAGS "-std=c++11 -fopenmp -w -DCV_REAL_TYPE_DOUBLE")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
+
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG}")
+elseif(CMAKE_BUILD_TYPE MATCHES Release)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}")
+else(...)
+	message(warning "Invalid Build Type - only Release and Debug supported, and give value is: ${CMAKE_BUILD_TYPE}")
+endif(...)
+
+message(${CMAKE_CXX_FLAGS})
 
 if (WIN32)
 	# to be changed so it can compile on msc
 	message(FATAL_ERROR "Windows not supported so far")
-endif(NOT WIN32)
+endif(WIN32)
 
 find_package(Qt4 REQUIRED)
 
