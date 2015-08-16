@@ -271,14 +271,12 @@ void resize(matrix<_Tp> in, matrix<_Tp> &out, size_t newRows, size_t newCols,
 						c11 = in(r_in_int, c_in_int);
 					}
 
-					float w00 = (1. - r_diff) * (1. - c_diff);
-					float w01 = (1. - r_diff) * (c_diff);
-					float w10 = (r_diff)* (1. - c_diff);
-					float w11 = (r_diff)* (c_diff);
+					real_t w00 = (1. - r_diff) * (1. - c_diff);
+					real_t w01 = (1. - r_diff) * (c_diff);
+					real_t w10 = (r_diff)* (1. - c_diff);
+					real_t w11 = (r_diff)* (c_diff);
 
-					_Tp res = _Tp(w00 * c00 + w01 * c01 + w10 * c10 + w11 * c11);
-
-					out(r, c) = res;
+					out(r, c) = _Tp(w00 * c00 + w01 * c01 + w10 * c10 + w11 * c11);
 				}
 			}
 	}
