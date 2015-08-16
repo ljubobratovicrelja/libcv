@@ -25,11 +25,9 @@
 
 #include "../include/optimization.hpp"
 
-#include <minpack.h>
-#include <cminpack.h>
+#include "cminpack.h"
 
 #include <limits>
-
 
 namespace cv {
 
