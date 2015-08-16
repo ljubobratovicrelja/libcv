@@ -43,9 +43,9 @@ int lmdif(optimization_fcn fcn, int m, int n, double *x, int maxfev, double ftol
 	int nfev=0; 
 
 	double* diag=new double[n]; 
-	double** fjac=new double*[m]; 
+	double** fjac=new double*[n]; 
 
-	for (int i = 0; i < n; ++i) { fjac[i] = new double[n]; }
+	for (int i = 0; i < n; ++i) { fjac[i] = new double[m]; }
 
 	int* ipvt=new int[n]; 
 
