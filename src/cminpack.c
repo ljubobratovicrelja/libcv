@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "cminpack.h"
+#include "../include/cminpack.h"
 
 #define max(a,b)    (((a) > (b)) ? (a) : (b))
 #define min(a,b)	(((a) < (b)) ? (a) : (b))
