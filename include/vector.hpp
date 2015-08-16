@@ -1,17 +1,17 @@
 // The MIT License (MIT)
-// 
+//
 // Copyright (c) 2015 Relja Ljubobratovic, ljubobratovic.relja@gmail.com
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -42,19 +42,19 @@ template<class const_iterator>
 real_t norm(const_iterator begin, const_iterator end, Norm n) {
 	real_t nv = 0;
 	switch (n) {
-		case Norm::L1:
-			do {
-				nv += std::fabs(*begin);
-			} while (++begin != end);
-			break;
-		case Norm::L2:
-			do {
-				nv += *begin*(*begin);
-			} while (++begin != end);
-			nv = sqrt(nv);
-			break;
-		default:
-			throw std::runtime_error("Norm type not supported");
+	case Norm::L1:
+		do {
+			nv += std::fabs(*begin);
+		} while (++begin != end);
+		break;
+	case Norm::L2:
+		do {
+			nv += *begin*(*begin);
+		} while (++begin != end);
+		nv = sqrt(nv);
+		break;
+	default:
+		throw std::runtime_error("Norm type not supported");
 	}
 	return nv;
 }
@@ -74,7 +74,7 @@ void normalize(iterator begin, iterator end, Norm n) {
  */
 template<class _Tp>
 class vector: public basic_array < _Tp > {
-public:
+  public:
 	typedef _Tp value_type;
 	typedef _Tp &reference;
 	typedef const _Tp &const_reference;
@@ -88,7 +88,7 @@ public:
 
 	typedef basic_array<_Tp> super_type; //! Type of the super class.
 
-public:
+  public:
 	//! Class constructor.
 	vector();
 	//! Construct vector from another range.
@@ -149,7 +149,7 @@ public:
 	 *
 	 * ASSERT(sub_vec.length() == 2); // sub-vector is of length 2
 	 * ASSERT(sub_vec[0] == vec[0] && sub_vec[1] == vec[2]); // sub-vector has every second item to the vector end.
-	 * ASSERT(&sub_vec[0] == &vec[0] && &sub_vec[1] == &vec[2]); // sub-vector data is the same as the vector. 
+	 * ASSERT(&sub_vec[0] == &vec[0] && &sub_vec[1] == &vec[2]); // sub-vector data is the same as the vector.
 	 * @endcode
 	 */
 	vector<_Tp> operator()(unsigned start, unsigned end, unsigned stride = 1);
@@ -289,14 +289,14 @@ public:
 template<class _Tp, unsigned _size>
 class vectorx {
 	static_assert(_size > 0, "Size of the vector has to be at least 1");
-public:
+  public:
 	typedef random_access_iterator<_Tp> iterator;  //!< random access iterator.
 	typedef random_access_iterator<const _Tp> const_iterator; //!< read-only random access iterator.
 
-protected:
+  protected:
 	_Tp _data[_size];  //!< Data of the vector.
 
-public:
+  public:
 	//! Default constructor.
 	vectorx();
 	//! Construct using initializer list of values.
@@ -329,14 +329,14 @@ public:
 
 	//! Assignment operator to scalar value - same as construction of a scalar value.
 	template<class _Up>
-		vectorx<_Tp, _size> operator=(const _Up & rhs);
+	vectorx<_Tp, _size> operator=(const _Up & rhs);
 
 	//! Assignment operator.
 	vectorx<_Tp, _size> operator=(const vectorx<_Tp, _size> &rhs);
 
 	//! Assignment operator to different sized vector. Fills the vector with overlapping indexed item values.
 	template<unsigned o_size>
-		vectorx<_Tp, _size> operator=(const vectorx<_Tp, o_size> &rhs);
+	vectorx<_Tp, _size> operator=(const vectorx<_Tp, o_size> &rhs);
 
 	//! Addition operator.
 	vectorx<_Tp, _size> operator+(const vectorx<_Tp, _size>& rhs) const;
@@ -359,6 +359,47 @@ public:
 	//! Item-wise divide operator.
 	vectorx<_Tp, _size>& operator/=(const vectorx<_Tp, _size>& rhs);
 
+	vectorx<_Tp, _size> operator+(_Tp rhs) const;
+	vectorx<_Tp, _size> operator-(_Tp rhs) const;
+	vectorx<_Tp, _size> operator*(_Tp rhs) const;
+	vectorx<_Tp, _size> operator/(_Tp rhs) const;
+
+	vectorx<_Tp, _size>& operator+=(_Tp rhs);
+	vectorx<_Tp, _size>& operator-=(_Tp rhs);
+	vectorx<_Tp, _size>& operator*=(_Tp rhs);
+	vectorx<_Tp, _size>& operator/=(_Tp rhs);
+
+	friend vectorx<_Tp, _size> operator+(_Tp rhs, const vectorx<_Tp, _size> &lhs) {
+		vectorx<_Tp, _size> ret;
+		for (unsigned i = 0; i < _size; ++i) {
+			ret[i] = rhs + lhs[i];
+		}
+		return ret;
+	}
+
+	friend vectorx<_Tp, _size> operator-(_Tp rhs, const vectorx<_Tp, _size> &lhs) {
+		vectorx<_Tp, _size> ret;
+		for (unsigned i = 0; i < _size; ++i) {
+			ret[i] = rhs - lhs[i];
+		}
+		return ret;
+	}
+
+	friend vectorx<_Tp, _size> operator*(_Tp rhs, const vectorx<_Tp, _size> &lhs) {
+		vectorx<_Tp, _size> ret;
+		for (unsigned i = 0; i < _size; ++i) {
+			ret[i] = rhs * lhs[i];
+		}
+		return ret;
+	}
+
+	friend vectorx<_Tp, _size> operator/(_Tp rhs, const vectorx<_Tp, _size> &lhs) {
+		vectorx<_Tp, _size> ret;
+		for (unsigned i = 0; i < _size; ++i) {
+			ret[i] = rhs / lhs[i];
+		}
+		return ret;
+	}
 	//! Calculate norm of the vector.
 	real_t norm(Norm n = Norm::L2) const;
 	//! Normalize this vector.
@@ -373,7 +414,7 @@ public:
 	real_t mean() const;
 	//! Calculate an angle between this and given vector.
 	real_t angle(const vectorx<_Tp, _size> &v) const;
-	 //! Rotate 2-d vector by an angle (in radians).
+	//! Rotate 2-d vector by an angle (in radians).
 	vectorx<_Tp, _size>& rotate(real_t angle);
 	//! Calculate dot product.
 	_Tp dot(const vectorx<_Tp, _size> &rhs) const;
@@ -412,7 +453,7 @@ public:
 	}
 	//! Get vector with values ranged from inside this vector. Does not reference data, but makes a copy.
 	template<unsigned range_data, unsigned range_end>
-		vectorx<_Tp, range_end - range_data> range();
+	vectorx<_Tp, range_end - range_data> range();
 
 	//! ostream operator.
 	friend std::ostream& operator<<(std::ostream& stream, const vectorx<_Tp, _size> &arr) {
@@ -523,7 +564,7 @@ typedef vector4f vector4r;
 
 template<class _Tp>
 vector<_Tp>::vector():
-super_type() {
+	super_type() {
 }
 
 template<class _Tp>
@@ -557,24 +598,24 @@ vector<_Tp>::vector(pointer data, unsigned length, unsigned stride, bool borrow)
 
 template<class _Tp>
 vector<_Tp>::vector(unsigned size):
-super_type(size) {
+	super_type(size) {
 }
 
 template<class _Tp>
 vector<_Tp>::vector(const std::initializer_list<_Tp> &list) :
-basic_array<_Tp>(list.size()) {
+	basic_array<_Tp>(list.size()) {
 	std::copy(list.begin(), list.end(), this->_begin);
 }
 
 template<class _Tp>
 vector<_Tp>::vector(const vector &cpy, bool deepCopy):
-super_type() {
+	super_type() {
 	this->copy(cpy, deepCopy);
 }
 
 template<class _Tp>
 vector<_Tp>::vector(vector &&move):
-super_type(move) {
+	super_type(move) {
 }
 
 template<class _Tp>
@@ -632,7 +673,7 @@ vector<_Tp> vector<_Tp>::operator()(unsigned start, unsigned end, unsigned strid
 	vec._data = this->_data;
 	vec._begin = this->_begin + start;
 	vec._shape = {static_cast<unsigned>(std::ceil(static_cast<double>(end - start + 1) / stride))};
-	vec._strides = this->_strides; 
+	vec._strides = this->_strides;
 	vec._strides[0]*=stride;
 	vec._refcount = this->_refcount;
 
@@ -650,7 +691,7 @@ const vector<_Tp> vector<_Tp>::operator()(unsigned start, unsigned end, unsigned
 	vec._data = this->_data;
 	vec._begin = this->_begin + start;
 	vec._shape = {static_cast<unsigned>(std::ceil(static_cast<double>(end - start + 1) / stride))};
-	vec._strides = this->_strides; 
+	vec._strides = this->_strides;
 	vec._strides[0]*=stride;
 	vec._refcount = this->_refcount;
 
@@ -757,23 +798,21 @@ real_t vector<_Tp>::distance(const vector<_Tp> &rhs, Norm n) const {
 	real_t d = 0;
 
 	switch (n) {
-		case Norm::L1:
-			{
-				for (unsigned i = 0; i < this->length(); ++i) {
-					d += std::fabs(this->at_index(i) - rhs[i]);
-				}
-			}
-			break;
-		case Norm::L2:
-			{
-				for (unsigned i = 0; i < this->length(); ++i) {
-					d += pow(this->at_index(i) - rhs[i], 2);
-				}
-				d = std::sqrt(d);
-			}
-			break;
-		default:
-			throw std::runtime_error("Norm type not supported");
+	case Norm::L1: {
+		for (unsigned i = 0; i < this->length(); ++i) {
+			d += std::fabs(this->at_index(i) - rhs[i]);
+		}
+	}
+	break;
+	case Norm::L2: {
+		for (unsigned i = 0; i < this->length(); ++i) {
+			d += pow(this->at_index(i) - rhs[i], 2);
+		}
+		d = std::sqrt(d);
+	}
+	break;
+	default:
+		throw std::runtime_error("Norm type not supported");
 	}
 	return d;
 }
@@ -1006,7 +1045,7 @@ vectorx<_Tp, _size>::vectorx(const std::initializer_list<_Tp> &list) {
 template<class _Tp, unsigned _size>
 vectorx<_Tp, _size>::vectorx(const _Tp &a) {
 	LOOP_FOR_TO(_size)
-		_data[i] = a;
+	_data[i] = a;
 }
 
 //! Vector-2 initializer. Vector needs to be previously defined as length 2.
@@ -1188,6 +1227,78 @@ vectorx<_Tp, _size>& vectorx<_Tp, _size>::operator/=(const vectorx<_Tp, _size>& 
 }
 
 template<class _Tp, unsigned _size>
+vectorx<_Tp, _size> vectorx<_Tp, _size>::operator+(_Tp rhs) const {
+	vectorx<_Tp, _size> ret;
+	for (unsigned i = 0; i < _size; ++i) {
+		ret[i] = this->_data[i] + rhs;
+	}
+	return ret;
+}
+
+template<class _Tp, unsigned _size>
+vectorx<_Tp, _size> vectorx<_Tp, _size>::operator-(_Tp rhs) const {
+	vectorx<_Tp, _size> ret;
+	for (unsigned i = 0; i < _size; ++i) {
+		ret[i] = this->_data[i] - rhs;
+	}
+	return ret;
+}
+
+template<class _Tp, unsigned _size>
+vectorx<_Tp, _size> vectorx<_Tp, _size>::operator*(_Tp rhs) const {
+	vectorx<_Tp, _size> ret;
+	for (unsigned i = 0; i < _size; ++i) {
+		ret[i] = this->_data[i] * rhs;
+	}
+	return ret;
+}
+
+template<class _Tp, unsigned _size>
+vectorx<_Tp, _size> vectorx<_Tp, _size>::operator/(_Tp rhs) const {
+	vectorx<_Tp, _size> ret;
+	for (unsigned i = 0; i < _size; ++i) {
+		ret[i] = this->_data[i] / rhs;
+	}
+	return ret;
+}
+
+template<class _Tp, unsigned _size>
+vectorx<_Tp, _size>& vectorx<_Tp, _size>::operator+=(_Tp rhs) {
+	for (unsigned i = 0; i < _size; ++i) {
+		this->_data[i] += rhs;
+	}
+	return *this;
+}
+
+template<class _Tp, unsigned _size>
+vectorx<_Tp, _size>& vectorx<_Tp, _size>::operator-=(_Tp rhs) {
+	for (unsigned i = 0; i < _size; ++i) {
+		this->_data[i] -= rhs;
+	}
+	return *this;
+}
+
+
+template<class _Tp, unsigned _size>
+vectorx<_Tp, _size>& vectorx<_Tp, _size>::operator*=(_Tp rhs) {
+	for (unsigned i = 0; i < _size; ++i) {
+		this->_data[i] *= rhs;
+	}
+	return *this;
+}
+
+
+template<class _Tp, unsigned _size>
+vectorx<_Tp, _size>& vectorx<_Tp, _size>::operator/=(_Tp rhs) {
+	for (unsigned i = 0; i < _size; ++i) {
+		this->_data[i] /= rhs;
+	}
+	return *this;
+}
+
+
+
+template<class _Tp, unsigned _size>
 real_t vectorx<_Tp, _size>::norm(Norm n) const {
 	return internal::norm(this->_data, this->_data + _size, n);
 }
@@ -1349,3 +1460,5 @@ vectorx<_Tp, range_end - range_start> vectorx<_Tp, _size>::range() {
 
 }
 #endif /* end of include guard: VECTOR_HPP_TRD8NTPW */
+
+
