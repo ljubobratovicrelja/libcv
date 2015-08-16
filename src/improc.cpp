@@ -48,6 +48,8 @@ matrixr gauss(const vec2i &kernel_size, real_t theta) {
 		kernel(i, j) = (1 / (2 * PI * pow(theta, 2))) * exp(-((pow(abs(midPoint_c - j), 2) + pow(abs(midPoint_r - i), 2)) / (2 * pow(theta, 2))));
 	}
 
+	cv::normalize(kernel.begin(), kernel.end(), Norm::L1);
+
 	return kernel;
 }
 
@@ -97,6 +99,21 @@ matrixr conv(const matrixr &in, const matrixr &conv_kernel) {
 	}
 
 	return out;
+}
+
+matrixr threshold(const matrixr &in, real_t low_thresh, real_t up_thresh) {
+
+	matrixr th = in.clone();
+
+	for(unsigned i = 0; i < in.rows(); ++i) {
+		for(unsigned j = 0; j < in.cols(); ++j) {
+			if (in(i, j) >= low_thresh && in(i, j) <= up_thresh)
+				th(i, j) = 1;
+			else
+				th(i, j) = 0;
+		}
+	}
+	return th;
 }
 
 template<class corner_detector>

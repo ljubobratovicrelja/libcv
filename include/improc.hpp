@@ -54,6 +54,11 @@ matrixr CV_EXPORT gauss(const vec2i &kernel, real_t theta = .84);
 matrixr CV_EXPORT conv(const matrixr &in, const matrixr &conv_kernel);
 
 /*!
+ * @brief Perform thrsholding for given image based on given lower and upper treshold value.
+ */
+matrixr CV_EXPORT threshold(const matrixr &in, real_t low_thresh, real_t up_thresh);
+
+/*!
  * @brief Harris corner detector.
  */
 matrixr CV_EXPORT harris(const matrixr &in, unsigned win_size = 3, real_t k = .64, real_t gauss = .84);
