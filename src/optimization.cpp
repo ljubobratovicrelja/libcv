@@ -25,7 +25,7 @@
 
 #include "../include/optimization.hpp"
 
-#include "cminpack.h"
+#include "../include/cminpack.h"
 
 #include <limits>
 
