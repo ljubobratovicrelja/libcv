@@ -357,7 +357,7 @@ bool writeJpeg(const image_array &image, const std::string &filename) {
 
 	image_array buff;
 
-	if (buff.is_contiguous())
+	if (image.is_contiguous())
 		buff = image;
 	else
 		buff = image.clone();
