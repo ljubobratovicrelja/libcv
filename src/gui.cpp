@@ -27,9 +27,6 @@
 #include "../include/gui.hpp"
 #include "../include/array.hpp"
 
-#include <QtCore/QtCore>
-#include <QtGui/QtGui>
-
 #ifdef WIN32
 // TODO: integrate qt include files in thirdParty directory.
 #include <QtWidgets/QDialog>

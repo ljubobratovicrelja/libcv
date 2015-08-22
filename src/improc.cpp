@@ -74,8 +74,8 @@ matrixr conv(const matrixr &in, const matrixr &conv_kernel) {
 		int pixpos[2];
 
 		#pragma omp for
-		for (unsigned r = 0; r < in.rows(); ++r) {
-			for (unsigned c = 0; c < in.cols(); ++c) {
+		for (int r = 0; r < in.rows(); ++r) {
+			for (int c = 0; c < in.cols(); ++c) {
 
 				pixel_value = 0;
 				conv_r = 0;

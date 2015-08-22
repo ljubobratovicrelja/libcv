@@ -167,13 +167,9 @@ class polygon: public contour<_Tp> {
 	polygon(std::initializer_list<point_type> list);
 	//! Copy constructor.
 	polygon(const polygon &) = default;
-	//! Move constructor.
-	polygon(polygon &&) = default;
 
 	//! Assignment operator.
 	polygon &operator=(const polygon &) = default;
-	//! Move operator.
-	polygon &operator=(polygon &&) = default;
 
 	//! Query if point is in polygon.
 	unsigned point_in_polygon(point_const_reference ptn) const;

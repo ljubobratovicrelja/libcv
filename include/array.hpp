@@ -36,6 +36,8 @@
 #include <algorithm>
 #include <stdexcept>
 #include <cstring>
+#include <vector>
+#include <string>
 
 #include "fwd.hpp"
 #include "indexarray.hpp"

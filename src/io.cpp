@@ -21,11 +21,13 @@
 // THE SOFTWARE.
 
 
+#include <cctype>
+
 #include "../include/io.hpp"
 
 
 extern "C" {
-#ifdef WINDOWS
+#ifdef _WIN32
 #include "../thirdParty/libpng/include/png.h"
 #include "../thirdParty/libpng/include/pngconf.h"
 #include "../thirdParty/libpng/include/pnglibconf.h"
@@ -34,7 +36,9 @@ extern "C" {
 #include <pngconf.h>
 #include <pnglibconf.h>
 #endif
+#ifndef CV_NO_JPEG
 #include <jpeglib.h>
+#endif
 }
 
 
@@ -283,6 +287,7 @@ bool writePng(const cv::image_array &buffer, const std::string &path) {
 	return true;
 }
 
+#ifndef CV_NO_JPEG
 struct my_error_mgr {
 	struct jpeg_error_mgr pub; /* "public" fields */
 
@@ -402,6 +407,7 @@ bool writeJpeg(const image_array &image, const std::string &filename) {
 
 	return true;
 }
+#endif
 
 bool imwrite(const image_array &image, const std::string &path) {
 	std::string ext = path.substr(path.find_last_of(".") + 1);
@@ -409,10 +415,12 @@ bool imwrite(const image_array &image, const std::string &path) {
 
 	if (ext == "png") 
 		return writePng(image, path);
+#ifndef CV_NO_JPEG
 	else if (ext == "jpg" || ext == "jpeg")
 		return writeJpeg(image, path);
+#endif
 	else 
-		throw std::runtime_error("Image format not supported - only png and jpg supported so far.");
+		throw std::runtime_error("Image format not supported.");
 }
 
 image_array CV_EXPORT imread(const std::string &path, data_type dtype, unsigned channels) {
@@ -422,9 +430,11 @@ image_array CV_EXPORT imread(const std::string &path, data_type dtype, unsigned 
 	for (auto &s : ext) { s = std::tolower(s);	}
 
 	if (ext == "png") 
-		loadPng(im, path);
+		loadPng(im, path);	
+#ifndef CV_NO_JPEG
 	else if (ext == "jpg" || ext == "jpeg")
 		loadJpeg(im, path);
+#endif
 	else 
 		throw std::runtime_error("Image format not supported - only png and jpg supported so far.");
 

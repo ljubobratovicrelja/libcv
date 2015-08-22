@@ -47,7 +47,7 @@ namespace cv {
 /*!
  * @brief Simple array structure useful for storing indices for n-D arrays.
  */
-class index_array {
+class CV_EXPORT index_array {
 private:
 	unsigned _data[INDEX_ARRAY_SIZE]; // data of the array.
 	unsigned _size; // used data in the array.

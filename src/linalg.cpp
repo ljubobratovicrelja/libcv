@@ -26,11 +26,19 @@
 #include "../include/linalg.hpp"
 #include "../include/math.hpp"
 
+#ifdef _WIN32
+#include "../thirdParty/blas/include/lapacke.h"
+
+extern "C" {
+#include "../thirdParty/blas/include/cblas.h"
+}
+#else
 #include <lapacke.h>
 
 extern "C" {
 #include <cblas.h>
 }
+#endif
 
 namespace cv {
 

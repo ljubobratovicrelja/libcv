@@ -221,7 +221,6 @@ bidirectional_iterator<_Tp>::bidirectional_iterator(pointer ptr, unsigned stride
 
 template<typename _Tp>
 bidirectional_iterator<_Tp>::bidirectional_iterator(const bidirectional_iterator<_Tp>& cpy) : _ptr(cpy._ptr), _stride(cpy._stride) {
-
 }
 
 template<typename _Tp>
@@ -234,6 +233,7 @@ bidirectional_iterator<_Tp>& bidirectional_iterator<_Tp>::operator=(const bidire
 		this->_ptr = rhs._ptr;
 		this->_stride = rhs._stride;
 	}
+	return *this;
 }
 
 template<typename _Tp>
