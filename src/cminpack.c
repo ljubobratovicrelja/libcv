@@ -7,14 +7,14 @@
 #define max(a,b)    (((a) > (b)) ? (a) : (b))
 #define min(a,b)	(((a) < (b)) ? (a) : (b))
 
-double dpmpar[] = { 2.220446049250313e-16,
+real_t dpmpar[] = { 2.220446049250313e-16,
 									2.225073858507201e-308,
 									1.797693134862315e308 };
 
-double enorm(int n, double x[])
+real_t enorm(int n, real_t x[])
 {
 	int i;
-	double sum;
+	real_t sum;
 
 	sum = x[0] * x[0];
 	for (i=1;i<n;i++)
@@ -23,10 +23,10 @@ double enorm(int n, double x[])
 }
 
 /* compute row norm for column c from row r to row m */
-double rownorm(int m, int r, int c, double **x)
+real_t rownorm(int m, int r, int c, real_t **x)
 {
 	int i;
-	double sum;
+	real_t sum;
 	sum = x[r][c] * x[r][c];
 	for (i = r+1;i < m; i++)
 		sum += x[i][c] * x[i][c];
@@ -34,10 +34,10 @@ double rownorm(int m, int r, int c, double **x)
 	return sqrt(sum);
 }
 
-double colnorm(int m, int r, int c, double **x)
+real_t colnorm(int m, int r, int c, real_t **x)
 {
 	int i;
-	double sum;
+	real_t sum;
 	sum = x[r][c] * x[r][c];
 	for (i = c+1;i < m; i++)
 		sum += x[r][i] * x[r][i];
@@ -46,11 +46,11 @@ double colnorm(int m, int r, int c, double **x)
 }
 
 
-void fdjac2(void f(int,int,double *,double *,int *),int m,int n,double x[],double fvec[],double **fjac,
-						int *iflag,double epsfcn,double wa[])
+void fdjac2(void f(int,int,real_t *,real_t *,int *),int m,int n,real_t x[],real_t fvec[],real_t **fjac,
+						int *iflag,real_t epsfcn,real_t wa[])
 {
 	int i,j;
-	double eps,epsmch,h,temp;
+	real_t eps,epsmch,h,temp;
 
 	epsmch = (epsfcn > dpmpar[0]) ? epsfcn : dpmpar[0];
 	eps = sqrt(epsmch);
@@ -68,13 +68,13 @@ void fdjac2(void f(int,int,double *,double *,int *),int m,int n,double x[],doubl
 	}
 }
 
-void lmpar(int n,double **r,int ipvt[],double diag[],double qtb[],
-					 double delta,double *par,double x[],double sdiag[],double wa1[],
-					 double wa2[])
+void lmpar(int n,real_t **r,int ipvt[],real_t diag[],real_t qtb[],
+					 real_t delta,real_t *par,real_t x[],real_t sdiag[],real_t wa1[],
+					 real_t wa2[])
 {
 	int i,iter,j,jp1,k,l,nsing;
-	double dxnorm,dwarf,fp,gnorm,parc,parl,paru;
-	double sum,temp;
+	real_t dxnorm,dwarf,fp,gnorm,parc,parl,paru;
+	real_t sum,temp;
 
 	dwarf = dpmpar[1];
 	nsing = n;
@@ -182,11 +182,11 @@ void lmpar(int n,double **r,int ipvt[],double diag[],double qtb[],
 	}
 }
 
-void qrfac(int m,int n,double **a,int pivot,int ipvt[],
-					 double rdiag[],double acnorm[],double wa[])
+void qrfac(int m,int n,real_t **a,int pivot,int ipvt[],
+					 real_t rdiag[],real_t acnorm[],real_t wa[])
 {
 	int i,j,jp1,k,kmax,minmn;
-	double ajnorm,epsmch,sum,temp;
+	real_t ajnorm,epsmch,sum,temp;
 
 	/* get machine precision */
 	epsmch = dpmpar[0];
@@ -247,16 +247,16 @@ void qrfac(int m,int n,double **a,int pivot,int ipvt[],
 	}
 }
 
-void lmdif(void f(int,int, double*,double*,int*),int m,
-					 int n,double x[],int msk[],double fvec[],double ftol,
-					 double xtol,double gtol,int maxfev,double epsfcn,double diag[],
-					 int mode,double factor,int *info,int *nfev,double **fjac,
-					 int ipvt[],double qtf[],double wa1[],double wa2[],
-					 double wa3[],double wa4[])
+void lmdif(void f(int,int, real_t*,real_t*,int*),int m,
+					 int n,real_t x[],int msk[],real_t fvec[],real_t ftol,
+					 real_t xtol,real_t gtol,int maxfev,real_t epsfcn,real_t diag[],
+					 int mode,real_t factor,int *info,int *nfev,real_t **fjac,
+					 int ipvt[],real_t qtf[],real_t wa1[],real_t wa2[],
+					 real_t wa3[],real_t wa4[])
 {
 	int i,iflag,iter,j,l;
-	double actred,delta,dirder,epsmch,fnorm,fnorm1,gnorm;
-	double par,pnorm,prered,ratio,sum,temp,temp1,temp2,xnorm;
+	real_t actred,delta,dirder,epsmch,fnorm,fnorm1,gnorm;
+	real_t par,pnorm,prered,ratio,sum,temp,temp1,temp2,xnorm;
 
 	/* initialize */
 	epsmch = dpmpar[0];
@@ -430,11 +430,11 @@ void lmdif(void f(int,int, double*,double*,int*),int m,
 }
 
 
-void qrsolv(int n,double **r,int ipvt[],double diag[],
-						double qtb[],double x[],double sdiag[],double wa[])
+void qrsolv(int n,real_t **r,int ipvt[],real_t diag[],
+						real_t qtb[],real_t x[],real_t sdiag[],real_t wa[])
 {
 	int i,j,jp1,k,kp1,l,nsing;
-	double qtbpj,sum,temp,dsin,dcos,dtan,dcotan;
+	real_t qtbpj,sum,temp,dsin,dcos,dtan,dcotan;
 
 	for (j = 0; j < n; j++) {
 		for (i = j; i < n; i++)
@@ -502,13 +502,13 @@ void qrsolv(int n,double **r,int ipvt[],double diag[],
 	}
 }
 
-int lmdif0(void fcn(int,int, double*,double*,int*),int m, int n,double x[],int msk[],
-					 double fvec[],double tol,int *info,int *nfev)
+int lmdif0(void fcn(int,int, real_t*,real_t*,int*),int m, int n,real_t x[],int msk[],
+					 real_t fvec[],real_t tol,int *info,int *nfev)
 {
 	int j,maxfev,mode;
 	int *ipvt;
-	double ftol,xtol,gtol,epsfcn,factor;
-	double *diag,**fjac,*qtf,*wa1,*wa2,*wa3,*wa4;
+	real_t ftol,xtol,gtol,epsfcn,factor;
+	real_t *diag,**fjac,*qtf,*wa1,*wa2,*wa3,*wa4;
 
 	/* Check input parameters */
 	if (n <= 0 || m < n || tol < 0.0) {
@@ -517,18 +517,18 @@ int lmdif0(void fcn(int,int, double*,double*,int*),int m, int n,double x[],int m
 	}
 	/* Allocate memory for working arrays. */
 	ipvt = (int *)malloc(n*sizeof(int));
-	diag = (double *)malloc(n*sizeof(double));
-	qtf = (double *)malloc(n*sizeof(double));
-	wa1 = (double *)malloc(n*sizeof(double));
-	wa2 = (double *)malloc(n*sizeof(double));
-	wa3 = (double *)malloc(n*sizeof(double));
-	wa4 = (double *)malloc(m*sizeof(double));
+	diag = (real_t *)malloc(n*sizeof(real_t));
+	qtf = (real_t *)malloc(n*sizeof(real_t));
+	wa1 = (real_t *)malloc(n*sizeof(real_t));
+	wa2 = (real_t *)malloc(n*sizeof(real_t));
+	wa3 = (real_t *)malloc(n*sizeof(real_t));
+	wa4 = (real_t *)malloc(m*sizeof(real_t));
 
 
 	/* Create 2d matrix for Jacobian */
-	fjac = (double **)malloc(n*sizeof(double *));
+	fjac = (real_t **)malloc(n*sizeof(real_t *));
 	for (j=0;j<n;j++)
-		fjac[j] = (double *)malloc(m*sizeof(double));
+		fjac[j] = (real_t *)malloc(m*sizeof(real_t));
 
 	/* Set convergence tolerances */
 	ftol = 1.0E-5; 
