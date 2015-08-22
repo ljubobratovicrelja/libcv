@@ -170,7 +170,7 @@ void CV_EXPORT geev(const matrixr &in, vector<real_t> &wr, vector<real_t> &wi, m
  * Disclamer - implementation borrowed from opencv/calib3d module. (cvRodrigues2)
  * 
  * \note Jacobian matrix needs to be initialized to 9x3 or 3x9 if output is expected. If jacobian is
- * initialized differently, mta::Exception will be thrown.
+ * initialized differently, std::runtime_error will be thrown.
  *
  * \throws std::runtime_error.
  *

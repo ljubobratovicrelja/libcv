@@ -41,7 +41,9 @@
 
 namespace cv {
 
+//! Write image to a filesystem.
 bool CV_EXPORT imwrite(const image_array &image, const std::string &path);
+//! Read an image from a filesystem.
 image_array CV_EXPORT imread(const std::string &path, data_type dtype = NONE, unsigned channels = 0);
 
 }

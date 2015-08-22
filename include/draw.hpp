@@ -40,6 +40,16 @@
 
 namespace cv {
 
+/*!
+ * @brief Draw the point on the image.
+ *
+ * @param mat Image on which to draw the point to.
+ * @param point x,y coordinates where the point will be drawn.
+ * @param color Color, pixel value which will be drawn on the image.
+ * @param strokeWidth width of the stroke, or point size.
+ *
+ * @TODO: implement AA.
+ */
 template<typename _Tp>
 void draw_point(matrix<_Tp>& mat, const vec2i& point, const _Tp &color, unsigned strokeWidth = 1) {
 	ASSERT(mat && strokeWidth > 0);
@@ -58,6 +68,15 @@ void draw_point(matrix<_Tp>& mat, const vec2i& point, const _Tp &color, unsigned
 	}
 }
 
+/*!
+ * @brief Draw the line on the image.
+ *
+ * @param mat Image on which to draw the line to.
+ * @param startPoint x,y coordinates where the line will start.
+ * @param endPoint x,y coordinates where the line will end.
+ * @param color Color, pixel value which will be drawn on the image.
+ * @param strokeWidth width of the stroke.
+ */
 template<typename _Tp>
 void draw_line(matrix<_Tp>& mat, const vec2i& startPoint, const vec2i& endPoint, const _Tp & color, unsigned strokeWidth = 1) {
 
@@ -98,6 +117,9 @@ void draw_line(matrix<_Tp>& mat, const vec2i& startPoint, const vec2i& endPoint,
 	}
 }
 
+/*!
+ * Draw circle on the image.
+ */
 template<typename _Tp>
 void draw_circle(matrix<_Tp>& mat, const vec2i& center, unsigned radius, const _Tp & color, unsigned strokeWidth = 1,
 		unsigned interpolationStep = 24) {
@@ -120,6 +142,9 @@ void draw_circle(matrix<_Tp>& mat, const vec2i& center, unsigned radius, const _
 	}
 }
 
+/*!
+ * Draw contour on the image.
+ */
 template<typename _Tp>
 void draw_contour(matrix<_Tp>& mat, const contouri &contour, const _Tp & color, unsigned strokeWidth = 1) {
 	for (unsigned i = 1; i < contour.point_length(); ++i) {
@@ -127,6 +152,11 @@ void draw_contour(matrix<_Tp>& mat, const contouri &contour, const _Tp & color, 
 	}
 }
 
+/*!
+ * Draw polygon on the image.
+ *
+ * @TODO: filled drawing does not work on concave polygons.
+ */
 template<typename _Tp>
 void draw_polygon(matrix<_Tp> &mat, const polygoni &polygon, const _Tp &color, unsigned strokeWidth = 1, bool filled = false) {
 
@@ -148,6 +178,9 @@ void draw_polygon(matrix<_Tp> &mat, const polygoni &polygon, const _Tp &color, u
 	}
 }
 
+/*!
+ * Draw rectangle on the image.
+ */
 template<typename _Tp>
 void draw_rect(matrix<_Tp>& mat, const regioni& reg, const _Tp & color, unsigned strokeWidth) {
 
@@ -169,7 +202,6 @@ void draw_rect(matrix<_Tp>& mat, const regioni& reg, const _Tp & color, unsigned
 	draw_line(mat, vec2i(dReg.x + dReg.width, dReg.y), vec2i(dReg.x + dReg.width, dReg.y + dReg.height), color, strokeWidth);
 	draw_line(mat, vec2i(dReg.x, dReg.y + dReg.height), vec2i(dReg.x + dReg.width, dReg.y + dReg.height), color, strokeWidth);
 }
-
 
 }
 

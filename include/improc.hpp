@@ -79,6 +79,10 @@ matrixr CV_EXPORT good_features(const matrixr &in, unsigned win_size = 3, real_t
  */
 std::vector<vec2r> CV_EXPORT extract_features(const matrixr &in, int count = -1);
 
+/*!
+ * Convert color matrix to gray matrix.
+ * TODO: consider changing the out tipe as a reference input, not as a return type.
+ */
 template<typename _Tp, size_t cnt> inline
 matrix<_Tp> color_to_gray(matrix<vectorx<_Tp, cnt> > in) {
 	matrix<_Tp> out;
@@ -90,33 +94,48 @@ matrix<_Tp> color_to_gray(matrix<vectorx<_Tp, cnt> > in) {
 
 	switch (cnt) {
 		case 1:
-			NEST_FOR_TO(in.rows(), in.cols()) {
-				out(i, j) = in(i, j)[0];
+			for(unsigned i = 0; i < in.rows(); ++i) {
+				for(unsigned j = 0; j < in.cols(); ++j) {
+					out(i, j) = in(i, j)[0];
+				}
 			}
 			break;
 		case 2:
-			NEST_FOR_TO(in.rows(), in.cols()) {
-				out(i, j) = in(i, j)[0];
+			for(unsigned i = 0; i < in.rows(); ++i) {
+				for(unsigned j = 0; j < in.cols(); ++j) {
+					out(i, j) = in(i, j)[0];
+				}
 			}
 			break;
 		case 3:
-			NEST_FOR_TO(in.rows(), in.cols()) {
-				out(i, j) = ranged_cast <_Tp> (in(i, j).mean());
+			for(unsigned i = 0; i < in.rows(); ++i) {
+				for(unsigned j = 0; j < in.cols(); ++j) {
+					out(i, j) = ranged_cast <_Tp> (in(i, j).mean());
+				}
 			}
 			break;
 		case 4:
-			NEST_FOR_TO(in.rows(), in.cols()) {
-				real_t meanVal = 0;
-				for (int c = 0; c < 3; c++) {
-					meanVal += in(i, j)[c];
+			for(unsigned i = 0; i < in.rows(); ++i) {
+				for(unsigned j = 0; j < in.cols(); ++j) {
+					real_t meanVal = 0;
+					for (int c = 0; c < 3; c++) {
+						meanVal += in(i, j)[c];
+					}
+					out(i, j) = _Tp(meanVal / 3);
 				}
-				out(i, j) = _Tp(meanVal / 3);
 			}
 			break;
 	}
 	return out;
 }
 
+/*!
+ * Calculate partial derivatives of a image.
+ *
+ * @param in Image whose derivatives are calculated.
+ * @param fx partial derivative values with respect to x.
+ * @param fy partial derivative values with respect to y.
+ */
 template <typename _Tp>
 void calc_derivatives(const matrix<_Tp> &in, matrix<_Tp> &fx, matrix<_Tp> &fy) {
 
@@ -148,6 +167,14 @@ void calc_derivatives(const matrix<_Tp> &in, matrix<_Tp> &fx, matrix<_Tp> &fy) {
 	fy(in.rows()-1, 0) = -1*in(in.rows()-2, 0) + in(in.rows()-1, 0);
 }
 
+/*!
+ * Perform non-maximum filtering of a image.
+ *
+ * @param in Input image.
+ * @param filter_size Size of the filtering kernel.
+ * 
+ * TODO: lmsw.create(reference) - replace this with loops as in convolution.
+ */
 template<typename _Tp>
 void filter_non_maximum(matrix<_Tp> &in, size_t filter_size) {
 
@@ -186,7 +213,6 @@ void filter_non_maximum(matrix<_Tp> &in, size_t filter_size) {
 		}
 	}
 }
-
 
 }
 

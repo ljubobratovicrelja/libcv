@@ -21,7 +21,7 @@
 //THE SOFTWARE.
 //
 // Description:
-// Contains basic n-d array implementation, used as base class to any other
+// Contains n-d array implementation, used as base class to any other
 // array-like structure, such as vector, matrix, etc.
 //
 // Authod:
@@ -45,7 +45,7 @@
 namespace cv {
 
 /*!
- * @brief Base array class with reference counted memory.
+ * @brief Base n-d array class with reference counted memory.
  *
  */
 template<class _Tp>
@@ -85,7 +85,6 @@ protected:
 	basic_array(size_type size1, size_type size2);
 	//! 3D array constructor.
 	basic_array(size_type size1, size_type size2, size_type size3);
-
 	//! Copy constructor.
 	basic_array(const basic_array &cpy, bool deepCopy = false);
 	//! Move constructor.
@@ -95,12 +94,10 @@ protected:
 	reference at_index(unsigned i);
 	//! Read-only index 1-d array at index i.
 	const_reference at_index(unsigned i) const;
-
 	//! Index 2-d array at index i, j.
 	reference at_index(unsigned i, unsigned j);
 	//! Read-only index 2-d array at index i, j.
 	const_reference at_index(unsigned i, unsigned j) const;
-
 	//! Index 3-d array at index i, j, k.
 	reference at_index(unsigned i, unsigned j, unsigned k);
 	//! Read-only index 3-d array at index i, j, k.

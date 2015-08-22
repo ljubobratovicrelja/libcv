@@ -46,9 +46,13 @@
 
 namespace cv {
 
+//! Show the image in a window.
 void CV_EXPORT imshow(const std::string &name, const image_array &image);
+//! Close a window by name.
 void CV_EXPORT imclose(const std::string &name);
+//! Close all windows.
 void CV_EXPORT imclose_all();
+//! Wait for a key input with a image widow up.
 char CV_EXPORT wait_key();
 
 }

@@ -621,8 +621,7 @@ void kd_tree<_Tp, dims, Comparator>::knn(const vec& searchPoint, unsigned nCount
     double bestDist = 99999999.999;
     find_knn(searchPoint, _tree_nodes[0], _tree_nodes[0], bpq, nCount, bestDist);
 
-    LOOP_FOR_TO(nCount)
-    {
+	for (int i = 0; i < nCount; ++i) {
         if (bpq.isPopulated(i)) {
             if (max_distance > 0.0) {
                 if (bpq.get_score(i) < max_distance)
@@ -668,8 +667,7 @@ void kd_tree<_Tp, dims, Comparator>::knn_tree_node(const vec& searchPoint, unsig
     double bestDist = 99999999.999;
     find_knn(searchPoint, _tree_nodes[0], _tree_nodes[0], bpq, nCount, bestDist);
 
-    LOOP_FOR_TO(nCount)
-    {
+	for (int i = 0; i < nCount; ++i) {
         if (bpq.isPopulated(i)) {
             if (max_distance > 0.0) {
                 if (bpq.get_score(i) < max_distance)

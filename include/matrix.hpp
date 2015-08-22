@@ -185,6 +185,7 @@ class matrix: public basic_array < _Tp > {
 	//! Reset this matrix to identity. Throws exception if matrix is not square.
 	void to_identity();
 	//! Reshape matrix. Change row and column size. For now works only on contiguous matrices.
+	// TODO: implement for non-contiguous matrices.
 	void reshape(unsigned rows, unsigned cols);
 
 	//! Index operator.
@@ -714,8 +715,10 @@ matrix<_Tp>::operator matrix<_Up>() const {
 
 	matrix<_Up> new_type(this->size());
 
-	NEST_FOR_TO(this->rows(), this->cols()) {
-		new_type(i, j) = static_cast<_Up>(this->at_index(i, j));
+	for(unsigned i = 0; i < this->rows(); ++i) {
+		for(unsigned j = 0; j < this->cols(); ++j) {
+			new_type(i, j) = static_cast<_Up>(this->at_index(i, j));
+		}
 	}
 
 	return new_type;
@@ -750,8 +753,10 @@ matrix<_Tp> operator+(const matrix<_Tp> &lhs, const matrix<_Tp> &rhs) {
 
 	matrix<_Tp> retval(lhs.rows(), lhs.cols());
 
-	NEST_PARALLEL_FOR_TO(lhs.rows(), lhs.cols()) {
-		retval(i, j) = lhs(i, j) + rhs(i, j);
+	for(unsigned i = 0; i < lhs.rows(); ++i) {
+		for(unsigned j = 0; j < lhs.cols(); ++j) {
+			retval(i, j) = lhs(i, j) + rhs(i, j);
+		}
 	}
 
 	return retval;
@@ -767,8 +772,10 @@ matrix<_Tp> operator-(const matrix<_Tp>& lhs, const matrix<_Tp>& rhs) {
 
 	matrix<_Tp> retVal(lhs.rows(), lhs.cols());
 
-	NEST_PARALLEL_FOR_TO(lhs.rows(), lhs.cols()) {
-		retVal(i, j) = lhs(i, j) - rhs(i, j);
+	for(unsigned i = 0; i < lhs.rows(); ++i) {
+		for(unsigned j = 0; j < lhs.cols(); ++j) {
+			retVal(i, j) = lhs(i, j) - rhs(i, j);
+		}
 	}
 
 	return retVal;
@@ -782,12 +789,12 @@ matrix<_Tp> operator*(const matrix<_Tp>& lhs, const matrix<_Tp>& rhs) {
 
 	matrix<_Tp> retVal(lhs.rows(), rhs.cols());
 
-	NEST_FOR_TO(lhs.rows(), rhs.cols()) {
-
-		retVal(i, j) = 0;
-
-		for (int c = 0; c < rhs.rows(); c++) {
-			retVal(i, j) += lhs(i, c) * rhs(c, j);
+	for(unsigned i = 0; i < lhs.rows(); ++i) {
+		for(unsigned j = 0; j < rhs.cols(); ++j) {
+			retVal(i, j) = 0;
+			for (int c = 0; c < rhs.rows(); c++) {
+				retVal(i, j) += lhs(i, c) * rhs(c, j);
+			}
 		}
 	}
 	return retVal;
@@ -866,8 +873,10 @@ matrix<_Tp> operator+(const matrix<_Tp> &lhs, double rhs) {
 
 	matrix<_Tp> retval(lhs.rows(), lhs.cols());
 
-	NEST_PARALLEL_FOR_TO(lhs.rows(), lhs.cols()) {
-		retval(i, j) = lhs(i, j) + rhs;
+	for(unsigned i = 0; i < lhs.rows(); ++i) {
+		for(unsigned j = 0; j < lhs.cols(); ++j) {
+			retval(i, j) = lhs(i, j) + rhs;
+		}
 	}
 
 	return retval;
@@ -881,12 +890,15 @@ matrix<_Tp> operator-(const matrix<_Tp> &lhs, double rhs) {
 
 	matrix<_Tp> retval(lhs.rows(), lhs.cols());
 
-	NEST_PARALLEL_FOR_TO(lhs.rows(), lhs.cols()) {
-		retval(i, j) = lhs(i, j) - rhs;
+	for(unsigned i = 0; i < lhs.rows(); ++i) {
+		for(unsigned j = 0; j < lhs.cols(); ++j) {
+			retval(i, j) = lhs(i, j) - rhs;
+		}
 	}
 
 	return retval;
 }
+
 
 //! Addition operator.
 template<typename _Tp>
@@ -896,9 +908,10 @@ matrix<_Tp> operator/(const matrix<_Tp> &lhs, double rhs) {
 
 	matrix<_Tp> retval(lhs.rows(), lhs.cols());
 
-	NEST_PARALLEL_FOR_TO(lhs.rows(), lhs.cols()) {
-		retval(i, j) = lhs(i, j) / rhs;
-
+	for(unsigned i = 0; i < lhs.rows(); ++i) {
+		for(unsigned j = 0; j < lhs.cols(); ++j) {
+			retval(i, j) = lhs(i, j) / rhs;
+		}
 	}
 
 	return retval;
@@ -912,9 +925,10 @@ matrix<_Tp> operator*(const matrix<_Tp> &lhs, double rhs) {
 
 	matrix<_Tp> retval(lhs.rows(), lhs.cols());
 
-	NEST_PARALLEL_FOR_TO(lhs.rows(), lhs.cols()) {
-		retval(i, j) = lhs(i, j) * rhs;
-
+	for(unsigned i = 0; i < lhs.rows(); ++i) {
+		for(unsigned j = 0; j < lhs.cols(); ++j) {
+			retval(i, j) = lhs(i, j) * rhs;
+		}
 	}
 
 	return retval;
@@ -928,9 +942,10 @@ matrix<_Tp> operator%(const matrix<_Tp> &lhs, double rhs) {
 
 	matrix<_Tp> retval(lhs.rows(), lhs.cols());
 
-	NEST_PARALLEL_FOR_TO(lhs.rows(), lhs.cols()) {
-		retval(i, j) = (int)lhs(i, j) % (int)rhs;
-
+	for(unsigned i = 0; i < lhs.rows(); ++i) {
+		for(unsigned j = 0; j < lhs.cols(); ++j) {
+			retval(i, j) = (int)lhs(i, j) % (int)rhs;
+		}
 	}
 
 	return retval;
@@ -941,10 +956,11 @@ matrix<_Tp> &operator+=(matrix<_Tp> &lhs, double rhs) {
 
 	ASSERT(lhs);
 
-	NEST_PARALLEL_FOR_TO(lhs.rows(), lhs.cols()) {
-		lhs(i, j) += rhs;
+	for(unsigned i = 0; i < lhs.rows(); ++i) {
+		for(unsigned j = 0; j < lhs.cols(); ++j) {
+			lhs(i, j) += rhs;
+		}
 	}
-
 	return lhs;
 }
 
@@ -953,8 +969,10 @@ matrix<_Tp> &operator-=(matrix<_Tp> &lhs, double rhs) {
 
 	ASSERT(lhs);
 
-	NEST_PARALLEL_FOR_TO(lhs.rows(), lhs.cols()) {
-		lhs(i, j) -= rhs;
+	for(unsigned i = 0; i < lhs.rows(); ++i) {
+		for(unsigned j = 0; j < lhs.cols(); ++j) {
+			lhs(i, j) -= rhs;
+		}
 	}
 
 	return lhs;
@@ -965,8 +983,10 @@ matrix<_Tp> &operator/=(matrix<_Tp> &lhs, double rhs) {
 
 	ASSERT(lhs);
 
-	NEST_PARALLEL_FOR_TO(lhs.rows(), lhs.cols()) {
-		lhs(i, j) /= rhs;
+	for(unsigned i = 0; i < lhs.rows(); ++i) {
+		for(unsigned j = 0; j < lhs.cols(); ++j) {
+			lhs(i, j) /= rhs;
+		}
 	}
 
 	return lhs;
@@ -977,8 +997,10 @@ matrix<_Tp> &operator*=(matrix<_Tp> &lhs, double rhs) {
 
 	ASSERT(lhs);
 
-	NEST_PARALLEL_FOR_TO(lhs.rows(), lhs.cols()) {
-		lhs(i, j) *= rhs;
+	for(unsigned i = 0; i < lhs.rows(); ++i) {
+		for(unsigned j = 0; j < lhs.cols(); ++j) {
+			lhs(i, j) *= rhs;
+		}
 	}
 
 	return lhs;
@@ -989,8 +1011,10 @@ matrix<_Tp> &operator%=(matrix<_Tp> &lhs, double rhs) {
 
 	ASSERT(lhs);
 
-	NEST_PARALLEL_FOR_TO(lhs.rows(), lhs.cols()) {
-		lhs(i, j) = (int)lhs(i, j) % (int)rhs;
+	for(unsigned i = 0; i < lhs.rows(); ++i) {
+		for(unsigned j = 0; j < lhs.cols(); ++j) {
+			lhs(i, j) = (int)lhs(i, j) % (int)rhs;
+		}
 	}
 
 	return lhs;

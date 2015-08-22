@@ -43,9 +43,10 @@ matrixr gauss(const vec2i &kernel_size, real_t theta) {
 	int midPoint_r = (kernel_size[0] / 2);
 	int midPoint_c = (kernel_size[1] / 2);
 
-	NEST_FOR_TO(kernel_size[0], kernel_size[1])
-	{
-		kernel(i, j) = (1 / (2 * PI * pow(theta, 2))) * exp(-((pow(abs(midPoint_c - j), 2) + pow(abs(midPoint_r - i), 2)) / (2 * pow(theta, 2))));
+	for(int i = 0; i < kernel_size[0]; ++i) {
+		for(int j = 0; j < kernel_size[1]; ++j) {
+			kernel(i, j) = (1 / (2 * PI * pow(theta, 2))) * exp(-((pow(abs(midPoint_c - j), 2) + pow(abs(midPoint_r - i), 2)) / (2 * pow(theta, 2))));
+		}
 	}
 
 	cv::normalize(kernel.begin(), kernel.end(), Norm::L1);

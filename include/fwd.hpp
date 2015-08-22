@@ -56,28 +56,10 @@
 #define RAD_TO_DEG(val) (double)( val * (180.0 / PI)) /*!< Convert radians to degrees. */
 #define DEG_TO_RAD(val) (double)( val * (PI / 180.0)) /*!< Convert degrees to radians. */
 
-#define LOOP_FOR(from,to,by) for(int i=from;i<to;i+=by)
-#define LOOP_FOR_TO(to) LOOP_FOR(0,to,1)
-#define NEST_FOR(from,to,by,from_nest,to_nest,by_nest) for(int i=from;i<to;i+=by) for(int j=from_nest;j<to_nest;j+=by_nest)
-#define NEST_FOR_TO(to,to_nest)  NEST_FOR(0,to,1,0,to_nest,1)
-
-#define OMP_PARALLEL_FOR CV_PRAGMA(omp parallel for) //!< OpenMP parallel for pragma initializer macro.
-#define OMP_INIT CV_PRAGMA(omp parallel) { //!< OpenMP parallel pragma initializer macro.
-#define OMP_END } //!< OpenMP parallel for pragma deinitializer macro.
-#define OMP_FOR CV_PRAGMA(omp for) //!< OpenMP for for pragma initializer macro.
-#define OMP_ATOMIC CV_PRAGMA(omp atomic) //!< Perform OpenMP atomic increment.
-#define OMP_CRITICAL CV_PRAGMA(omp critical) //!< Start OpenMP critical segment.
-#define LOOP_OMP_FOR(cnti) OMP_FOR LOOP_FOR_TO(cnti) //!< OpenMP for pragma initializer with loop macro.
-#define LOOP_PARALLEL_FOR(from,to,by) OMP_PARALLEL_FOR LOOP_FOR(from,to,by) //!< OpenMP parallel for pragma initializer with loop macro.
-#define LOOP_PARALLEL_FOR_TO(cnt) OMP_PARALLEL_FOR LOOP_FOR_TO(cnt) //!< OpenMP parallel for pragma initializer macro.
-#define NEST_PARALLEL_FOR_TO(cnti, cntj) LOOP_PARALLEL_FOR_TO(cnti) for(int j = 0; j < cntj; j++) //!< OpenMP parallel for pragma initializer with nested loop macro.
-#define NEST_OMP_FOR_TO(cnti, cntj) OMP_FOR NEST_FOR_TO(cnti, cntj) //!< OpenMP parallel for pragma initializer with nested loop macro.
-#define FOREACH(iter, cnt) for(auto iter = cnt.begin(); iter != cnt.end(); iter++)
-#define ITERATE(iter, begin, end) for (auto iter = begin; iter != end; iter++)
-
 typedef unsigned char byte;
 typedef byte uchar;
 typedef unsigned int uint;
+typedef unsigned refcount_type;
 
 #ifdef CV_REAL_TYPE_DOUBLE
 typedef double real_t;
@@ -87,41 +69,18 @@ typedef float real_t;
 
 #define INTERPRET_INDEX(idx,length) (idx >= 0) ? idx : length + idx
 
-enum parallelization_module {
-	CV_OPENMP,
-	CV_TBB,
-	CV_OCL
-};
-
-#ifndef CV_PARALLELIZATION_MODULE
-#ifdef _OPENMP
-#define CV_PARALLELIZATION_MODULE CV_OPENMP
-#endif
-
-#endif
-
 #ifndef VECTOR_PARALLELIZATION_THRESHOLD
-
 /*!
 	\def VECTOR_PARALLELIZATION_THRESHOLD
 
-	This value represents a threshold after which some of algorithms over vectors will be paralellized on the CPU/GPU.
-	For instance, small vectors (e.g. with size less than 1000) will take more time to allocate thread stack space
-	(or allocating device memory for GPU), than to simply evaluate an algorithm on a single CPU core. For larger
-	vectors (default value is 100000), parallelization of defined type (default is OpenMP) will be initialized.
-
-	\note
-	This value is initialized in fwd.hpp header, but will be overriden if preprocessor define with the same
-	name is defined in compilation setup. (/DVECTOR_PARALLELIZATION_THRESHOLD=100000)
-	*/
-#define VECTOR_PARALLELIZATION_THRESHOLD 100000
+	This value represents a threshold after which some of algorithms over vectors will be paralellized.
+*/
+#define VECTOR_PARALLELIZATION_THRESHOLD (unsigned long)1e+6
 #endif
 
 #ifndef CV_BPQ_INIT_VALUE
 #define CV_BPQ_INIT_VALUE 10e+30
 #endif
-
-typedef unsigned refcount_type;
 
 #define REF_INCREMENT(ref) if(ref) ++(*ref) //!< Increment reference counter - assumes given value (int*) is initialized.
 #define REF_DECREMENT(ref) if(ref) --(*ref) //!< Decrement reference counter - assumes given value (int*) is initialized.
@@ -185,10 +144,6 @@ enum class InterpolationType  //! Interpolation value_type used by some function
 	LINEAR, /*!< Bilinear interpolation. */
 	CUBIC, /*!< Bicubic interpolation. */
 	NO_INTER  //!< No interpolation used.
-};
-
-enum ColorConvertion {
-
 };
 
 enum class ImageDepth {

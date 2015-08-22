@@ -43,6 +43,7 @@
 
 namespace cv {
 
+//! Type of the data contained by the image_array.
 enum data_type {
     NONE = 0,
     UINT8,

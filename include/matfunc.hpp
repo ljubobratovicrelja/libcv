@@ -21,9 +21,9 @@
 // THE SOFTWARE.
 //
 // Description:
-// Collection of matrix operations and functions.
+// Collection of matrix operations and functions. 
 //
-// Author:
+// // Author:
 // Relja Ljubobratovic, ljubobratovic.relja@gmail.com
 
 
@@ -37,6 +37,14 @@
 
 namespace cv {
 
+/*!
+ * Calculate cross product of two matrices.
+ *
+ * Performs same as regular multiplication operator for 
+ * matrices, but is useful if this method is used in
+ * large loops, because it will not reallocate resulting
+ * matrix if its of corresponding size.
+ */
 template<typename _Tp> inline
 void cross(const matrix<_Tp>& m1, const matrix<_Tp>& m2, matrix<_Tp>& out) {
 
@@ -48,9 +56,11 @@ void cross(const matrix<_Tp>& m1, const matrix<_Tp>& m2, matrix<_Tp>& out) {
 
 	out.fill(0);
 
-	NEST_FOR_TO(m1.rows(), m2.cols()) {
-		for (int c = 0; c < m2.rows(); c++) {
-			out(i, j) += m1(i, c) * m2(c, j);
+	for(unsigned i = 0; i < m2.rows(); ++i) {
+		for(unsigned j = 0; j < m2.cols(); ++j) {
+			for (int c = 0; c < m2.rows(); c++) {
+				out(i, j) += m1(i, c) * m2(c, j);
+			}
 		}
 	}
 }
@@ -72,8 +82,10 @@ void transpose(const matrix<_Tp> &in, matrix<_Tp>& out) {
 	if (out.rows() != in.cols() || out.cols() != in.rows())
 		out.create(in.cols(), in.rows());
 
-	NEST_FOR_TO(workmatrix.rows(), workmatrix.cols()) {
-		out(j, i) = workmatrix(i, j);
+	for(unsigned i = 0; i < workmatrix.rows(); ++i) {
+		for(unsigned j = 0; j < workmatrix.cols(); ++j) {
+			out(j, i) = workmatrix(i, j);
+		}
 	}
 
 }
@@ -204,7 +216,7 @@ void resize(matrix<_Tp> in, matrix<_Tp> &out, size_t newRows, size_t newCols,
 		/*
 		nearest neighbour interpolation - choose closest member
 		*/
-		OMP_PARALLEL_FOR
+#pragma omp parallel for
 			for (unsigned r = 0; r < newRows; r++) {
 
 				float r_old, c_old;
@@ -234,7 +246,7 @@ void resize(matrix<_Tp> in, matrix<_Tp> &out, size_t newRows, size_t newCols,
 		f(x,y) = f(0,0)(1-x)(1-y) + f(1,0)x(1-y) + f(0,1)(1-x)y + f(1,1)xy;
 		*/
 
-		OMP_PARALLEL_FOR
+#pragma omp parallel for
 			for (unsigned r = 0; r < newRows; r++) {
 
 				_Tp c00, c01, c10, c11;
@@ -305,7 +317,7 @@ template<typename _Tp>
 _Tp trace(const matrix<_Tp>& in) {
 	ASSERT(in.is_square());
 	_Tp retVal = _Tp(0);
-	LOOP_FOR_TO(in.rows()) {
+	for (int i = 0; i < in.rows(); ++i) {
 		retVal += in(i, i);
 	}
 	return retVal;
