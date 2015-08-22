@@ -28,6 +28,7 @@
 
 #include <iostream>
 #include <algorithm>
+#include <time.h>
 
 #include "../include/gui.hpp"
 #include "../include/matrix.hpp"
@@ -70,11 +71,11 @@ int main() {
 
 		kd.knn_index(ptr_search, nnCount, idResults, radius);
 
-		cv::draw_circle(img, ptr_search, 5, {255, 0, 0});
-		cv::draw_circle(img, ptr_search, radius, {255, 255, 0});
+		cv::draw_circle(img, ptr_search, 5, cv::vec3b(255, 0, 0));
+		cv::draw_circle(img, ptr_search, radius, cv::vec3b(255, 255, 0));
 
 		for (auto id : idResults) {
-			cv::draw_circle(img, source[id], 5, {0, 255, 0});
+			cv::draw_circle(img, source[id], 5, cv::vec3b(0, 255, 0));
 		}
 
 		cv::imshow("KD", img);
