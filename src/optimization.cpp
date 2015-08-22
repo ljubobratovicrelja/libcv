@@ -31,30 +31,30 @@
 
 namespace cv {
 
-int lmdif(optimization_fcn fcn, int m, int n, double *x, int maxfev, double ftol, double xtol, double gtol, double epsfcn) {
+int lmdif(optimization_fcn fcn, int m, int n, real_t *x, int maxfev, real_t ftol, real_t xtol, real_t gtol, real_t epsfcn) {
 
 	ASSERT(m > n && x);
 
-	double* fvec=new double[m]; 
+	real_t* fvec=new real_t[m]; 
 
 	int mode=1;
-	double factor=1;
+	real_t factor=1;
 	int info=0; 
 	int nfev=0; 
 
-	double* diag=new double[n]; 
-	double** fjac=new double*[n]; 
+	real_t* diag=new real_t[n]; 
+	real_t** fjac=new real_t*[n]; 
 
-	for (int i = 0; i < n; ++i) { fjac[i] = new double[m]; }
+	for (int i = 0; i < n; ++i) { fjac[i] = new real_t[m]; }
 
 	int* ipvt=new int[n]; 
 
-	double* qtf=new double[n]; 
+	real_t* qtf=new real_t[n]; 
 	int *msk = new int[n];
-	double* wa1=new double[n]; 
-	double* wa2=new double[n]; 
-	double* wa3=new double[n]; 
-	double* wa4=new double[m]; 
+	real_t* wa1=new real_t[n]; 
+	real_t* wa2=new real_t[n]; 
+	real_t* wa3=new real_t[n]; 
+	real_t* wa4=new real_t[m]; 
 
 	::lmdif(fcn, m, n, x, msk, fvec, ftol, xtol, gtol, maxfev, epsfcn, diag, mode, factor, &info, &nfev,
 			fjac, ipvt, qtf, wa1, wa2, wa3, wa4);
@@ -74,13 +74,13 @@ int lmdif(optimization_fcn fcn, int m, int n, double *x, int maxfev, double ftol
 	return info;
 }
 
-int lmdif1(optimization_fcn fcn, int m, int n, double *x, double tol) {
-	ASSERT(m > n && x && tol > std::numeric_limits<double>::min());
+int lmdif1(optimization_fcn fcn, int m, int n, real_t *x, real_t tol) {
+	ASSERT(m > n && x && tol > std::numeric_limits<real_t>::min());
 
 	int info = 0;
 
 	int     *msk = new int[n];
-	double  *fvec = new double[m];
+	real_t  *fvec = new real_t[m];
 	int     nfev;
 
 	::lmdif0(fcn, m,n,x,msk,fvec,tol,&info,&nfev);
