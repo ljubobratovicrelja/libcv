@@ -11,10 +11,5 @@ Libcv depends on following libraries:
 * lapacke
 * blas
 
-### Qt4 note
-Qt 4.8.6 is used for this project. In linux, this version comes by default in most distributions'
-package mangers. For windows, this version needs to be downloaded, compiled with corresponding 
-compiler and tools, and linked in cmake for libcv compilation.
-
 # LICENSE
 Library is under MIT license. See LICENSE file for details.
