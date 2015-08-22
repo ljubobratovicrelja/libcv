@@ -25,6 +25,8 @@
 // 
 // Author:
 // Relja Ljubobratovic, ljubobratovic.relja@gmail.com
+//
+// TODO: Change lmdif array input from real_t* to cv::vectorr - also wrap cminpack to use real_t.
 
 
 #ifndef OPTIMIZATION_HPP_YPHLDAFR
@@ -48,18 +50,18 @@ namespace cv {
  * @param iflag signal for optimization termination. Is 0 if optimization 
  * should terminate.
  */
-typedef void (*optimization_fcn)(int m, int n, double *x, double *fvec, int *iflag);
+typedef void (*optimization_fcn)(int m, int n, real_t *x, real_t *fvec, int *iflag);
 
 /*!
  * @brief Wrapper structure for convinient use of minpacks lmdif routine.
  */
-int CV_EXPORT lmdif(optimization_fcn fcn, int m, int n, double *x, int maxfev = 400, double ftol = 1e-08, double xtol=1e-08, 
-		double gtol=1e-08, double epsfcn=1e-08);
+int CV_EXPORT lmdif(optimization_fcn fcn, int m, int n, real_t *x, int maxfev = 400, real_t ftol = 1e-08, real_t xtol=1e-08, 
+		real_t gtol=1e-08, real_t epsfcn=1e-08);
 
 /*!
  * @brief Wrapper structure for convinient use of minpacks lmdif1 routine.
  */
-int CV_EXPORT lmdif1(optimization_fcn fcn, int m, int n, double *x, double tol = 1e-16);
+int CV_EXPORT lmdif1(optimization_fcn fcn, int m, int n, real_t *x, real_t tol = 1e-16);
 
 }
 
