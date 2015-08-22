@@ -19,7 +19,7 @@ At this early stage, libcv contains following:
 
 ## Dependencies
 Libcv depends on following libraries:
-* Qt4 (4.8.6) - for gui (if compiled with CV_IGNORE_GUI Qt is not required)
+* Qt4 (4.8.6)
 * libpng (libpng16)
 * libjpg (jpegsr8)
 * lapacke
@@ -27,7 +27,8 @@ Libcv depends on following libraries:
 
 ## Documentation
 Proper documentation is not available, and it will not be if there is no interest
-from other people to use this library. 
+from other people to use this library. I'll try to document code in doxygen style,
+so if anyone is up to it, he can build doc files himself.
 
 ## Compilation
 LibCV is mainly developed on Ubuntu with gcc 4.9.2. Ubuntu 15.04 has all needed libraries (and
@@ -40,7 +41,7 @@ Also building blas and lapack should not be of any trouble on any *nix system.
 ### Custom CMake build flags
 * **WITH_GUI** - if FALSE, ignores gui module, and doesn't link Qt
 * **WITH_JPEG** - turn on jpeg i/o support. If FALSE, does not link libjpeg.
-* **DOUBLE_REAL** - if TRUE, real type in LibCV is double, else if float.
+* **DOUBLE_REAL** - if TRUE, real type in LibCV is double, if FALSE it is of single precision.
 * **COMPILE_EXAMPLES** - compile example programs in ./examples/ directory. 
 
 ## Compilation on Windows
@@ -67,14 +68,17 @@ image loading, for jpeg I'm not sure, haven't test it.
 ### OpenBLAS
 Easiest way to get blas and lapacke is through OpenBlas. Here are some nice instructions
 on how to install it:
+
 [https://github.com/arrayfire/arrayfire/wiki/CBLAS-for-Windows](https://github.com/arrayfire/arrayfire/wiki/CBLAS-for-Windows)
+
 
 As guide suggests, you'd need cygwin with x86_64-w64-mingw32-gcc and x86_64-w64-mingw32-gfortran,
 and with cygwin terminal, compilation is easy - just make, and make install:
-'''
+
+```
 make BINARY=64 CC=/usr/bin/x86_64-w64-mingw32-gcc-4.8.3.exe FC=/usr/bin/x86_64-w64-mingw32-gfortran.exe
 make PREFIX=./package install
-'''
+```
 
 Step 8., 9. and 10. can be skipped, since resulting lib file (libopenblas.dll.a) can be 
 successfully linked with VC.
@@ -82,7 +86,7 @@ successfully linked with VC.
 
 # Contributions
 If anybody is interested to make a contrubution, you're welcome, and thank you! 
-Of course at this point, coding conventions or such rules are not firmlly 
+Of course at this point, coding conventions or such rules are not firmly 
 established - as long as you're willing to contribute, just make a pull request, 
 and we'll work it out...
 
