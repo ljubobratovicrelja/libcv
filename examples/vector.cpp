@@ -21,60 +21,62 @@
 // THE SOFTWARE.
 //
 // Description:
-// Example program for usage of cv::matrix
+// Example program for usage of cv::vector and cv::vectorx
 
 
 #include <iostream>
 #include <algorithm>
 
-#include "../include/matrix.hpp"
+#include "../include/vector.hpp"
 
 
 int main() {
 
-	cv::matrix<double> mat(3, 3);
-	std::cout << "3x3 matrix:\n" << mat << std::endl;
+	cv::vector<float> vec;
+	ASSERT(vec.empty());
 
-	mat.fill(3);
+	unsigned vec_size = 6;
 
-	std::cout << "3x3 matrix filled with 3:\n" << mat << std::endl;
+	vec.create(vec_size);
+	ASSERT(vec.length() == vec_size);
+	ASSERT(vec);
 
-	mat.reshape(1, 9);
+	vec[0] = 1;
+	vec[1] = 3;
+	vec[2] = 5;
+	vec[3] = 7;
+	vec[4] = 9;
+	vec[5] = 11;
 
-	std::cout << "1x9 reshaped matrix:\n" << mat << std::endl;
+	auto m = vec.min();
+	ASSERT(*m == 1);
 
-	mat.reshape(3, 3);
+	m = vec.max();
+	ASSERT(*m == vec[vec_size - 1]);
 
-	std::cout << "3x3 reshaped to original:\n" << mat << std::endl;
+	auto st_vec = vec(0, vec_size - 1, 2);
+	ASSERT(st_vec[0] == vec[0] && st_vec[1] == vec[2] && st_vec[2] == vec[4]);
+	ASSERT(&st_vec[0] == &vec[0] && &st_vec[1] == &vec[2] && &st_vec[2] == &vec[4]);
 
-	auto r = mat.row(1);
-	r.fill(0);
-	ASSERT(mat(1, 0) == 0 && mat(1, 1) == 0 && mat(1, 2) == 0);
+	const cv::vector<float> const_st_vec = vec(0, vec_size - 1, 2);
+	ASSERT(const_st_vec[0] == vec[0] && const_st_vec[1] == vec[2] && const_st_vec[2] == vec[4]);
 
-	auto c = mat.col(1);
-	c.fill(1);
-	ASSERT(mat(0, 1) == 1 && mat(1, 1) == 1 && mat(2, 1) == 1);
+	cv::vector<int> init_vec = {1, 3, 4};
+	ASSERT(init_vec.length() == 3 && init_vec[0] == 1 && init_vec[1] == 3 && init_vec[2] == 4);
 
-	cv::matrix3f mat_3f(3, 3);
-	mat_3f.fill({255, 15, 354});
-	std::cout << mat_3f << std::endl;
+	auto vec_cpy = st_vec.clone();
+	ASSERT(std::equal(vec_cpy.begin(), vec_cpy.end(), st_vec.begin()));
+	ASSERT(&vec_cpy[0] != &st_vec[0]);
 
-	cv::vectori v = {1, 2, 3, 4};
-	cv::matrixi mat_from_vector = v;
+	// distance ------------------------------
 
-	ASSERT(v.data() ==	mat_from_vector.data());
-	ASSERT(mat_from_vector.rows() == 1 && mat_from_vector.cols() == v.length());
+	cv::vector<int> a = {1, 2};
+	cv::vector<int> b = {1, 3};
 
-	std::cout << "Mat from vector:\n" << mat_from_vector << std::endl;
+	ASSERT(a.distance(b) == 1.);
 
-	cv::vec3i vx = {1, 2, 3};
-	cv::matrixi mat_from_vectorx = vx;
-
-	std::cout << mat_from_vectorx.size() << std::endl;
-
-	ASSERT(mat_from_vectorx.rows() == 1 && mat_from_vectorx.cols() == 3);
-
-	std::cout << "Mat from vectorx:\n" << mat_from_vectorx << std::endl;
+	cv::vector<float> a_f = a; // conversion to float.
+	a_f.normalize();
 
 	return EXIT_SUCCESS;
 }

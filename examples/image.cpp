@@ -1,3 +1,4 @@
+
 // The MIT License (MIT)
 //
 // Copyright (c) 2015 Relja Ljubobratovic, ljubobratovic.relja@gmail.com
@@ -21,60 +22,48 @@
 // THE SOFTWARE.
 //
 // Description:
-// Example program for usage of cv::matrix
+// Example program for usage of cv::image_array, gui and io, and of some procedures form improc.
 
 
 #include <iostream>
 #include <algorithm>
 
-#include "../include/matrix.hpp"
+#include "../include/improc.hpp"
+#include "../include/image.hpp"
+#include "../include/io.hpp"
+#include "../include/gui.hpp"
 
 
-int main() {
+int main(int argc, char **argv) {
 
-	cv::matrix<double> mat(3, 3);
-	std::cout << "3x3 matrix:\n" << mat << std::endl;
+	if (argc != 2) {
+		std::cout << "Invalid arguments - add path to an png or jpg image" << std::endl;
+		return EXIT_FAILURE;
+	}
 
-	mat.fill(3);
+	cv::image_array im = cv::imread(argv[1], cv::UINT8, 1);
+	im.convert_to(cv::REAL);
 
-	std::cout << "3x3 matrix filled with 3:\n" << mat << std::endl;
+	cv::matrixr im_r, f_x, f_y, blur, f_grad, h, s, non_max;
 
-	mat.reshape(1, 9);
+	im_r = im;
 
-	std::cout << "1x9 reshaped matrix:\n" << mat << std::endl;
+	cv::calc_derivatives(im_r, f_x, f_y);
 
-	mat.reshape(3, 3);
+	f_grad = cv::normalize(f_x + f_y);
 
-	std::cout << "3x3 reshaped to original:\n" << mat << std::endl;
+	h = cv::normalize(cv::harris(im_r, 3, 0.8, 1));
+	s = cv::normalize(cv::good_features(im_r, 3, 1));
 
-	auto r = mat.row(1);
-	r.fill(0);
-	ASSERT(mat(1, 0) == 0 && mat(1, 1) == 0 && mat(1, 2) == 0);
+	non_max = s.clone();
+	cv::filter_non_maximum(non_max, 5);
 
-	auto c = mat.col(1);
-	c.fill(1);
-	ASSERT(mat(0, 1) == 1 && mat(1, 1) == 1 && mat(2, 1) == 1);
-
-	cv::matrix3f mat_3f(3, 3);
-	mat_3f.fill({255, 15, 354});
-	std::cout << mat_3f << std::endl;
-
-	cv::vectori v = {1, 2, 3, 4};
-	cv::matrixi mat_from_vector = v;
-
-	ASSERT(v.data() ==	mat_from_vector.data());
-	ASSERT(mat_from_vector.rows() == 1 && mat_from_vector.cols() == v.length());
-
-	std::cout << "Mat from vector:\n" << mat_from_vector << std::endl;
-
-	cv::vec3i vx = {1, 2, 3};
-	cv::matrixi mat_from_vectorx = vx;
-
-	std::cout << mat_from_vectorx.size() << std::endl;
-
-	ASSERT(mat_from_vectorx.rows() == 1 && mat_from_vectorx.cols() == 3);
-
-	std::cout << "Mat from vectorx:\n" << mat_from_vectorx << std::endl;
+	cv::imshow("im", im);
+	cv::imshow("gradients", f_grad);
+	cv::imshow("harris corners", h);
+	cv::imshow("shi-tomasi corners", s);
+	cv::imshow("shi-tomasi corners non-max", non_max);
+	cv::wait_key();
 
 	return EXIT_SUCCESS;
 }

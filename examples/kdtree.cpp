@@ -1,3 +1,5 @@
+
+
 // The MIT License (MIT)
 //
 // Copyright (c) 2015 Relja Ljubobratovic, ljubobratovic.relja@gmail.com
@@ -21,60 +23,84 @@
 // THE SOFTWARE.
 //
 // Description:
-// Example program for usage of cv::matrix
+// Example program for usage of cv::kd_tree.
 
 
 #include <iostream>
 #include <algorithm>
 
+#include "../include/gui.hpp"
 #include "../include/matrix.hpp"
+#include "../include/kdtree.hpp"
+#include "../include/draw.hpp"
 
 
 int main() {
 
-	cv::matrix<double> mat(3, 3);
-	std::cout << "3x3 matrix:\n" << mat << std::endl;
+	srand(time(NULL));
 
-	mat.fill(3);
+	std::vector<cv::vec2i> result;
 
-	std::cout << "3x3 matrix filled with 3:\n" << mat << std::endl;
+	std::vector<cv::vec2i> source, results;
+	std::vector<unsigned> idResults;
 
-	mat.reshape(1, 9);
+	for (unsigned i = 0; i < 1000; i++) {
+		cv::vec2i ptr = { rand() % 599, rand() % 599 };
+		source.push_back(ptr);
+	}
 
-	std::cout << "1x9 reshaped matrix:\n" << mat << std::endl;
+	double radius = 250.0;
+	int nnCount = 6;
 
-	mat.reshape(3, 3);
+	cv::vec2i ptr_search = { rand() % 600, rand() % 600 };
 
-	std::cout << "3x3 reshaped to original:\n" << mat << std::endl;
+	cv::kd_tree2i kd(source);
 
-	auto r = mat.row(1);
-	r.fill(0);
-	ASSERT(mat(1, 0) == 0 && mat(1, 1) == 0 && mat(1, 2) == 0);
+	while (true) {
 
-	auto c = mat.col(1);
-	c.fill(1);
-	ASSERT(mat(0, 1) == 1 && mat(1, 1) == 1 && mat(2, 1) == 1);
+		if (nnCount < 3) {
+			nnCount = 3;
+		}
 
-	cv::matrix3f mat_3f(3, 3);
-	mat_3f.fill({255, 15, 354});
-	std::cout << mat_3f << std::endl;
+		cv::matrix3b img = cv::matrix3b::zeros(600,600);
 
-	cv::vectori v = {1, 2, 3, 4};
-	cv::matrixi mat_from_vector = v;
+		for (unsigned i = 0; i < source.size(); i++) {
+			cv::draw_circle(img, source[i], 5, cv::vec3b {0, 0, 255});
+		}
 
-	ASSERT(v.data() ==	mat_from_vector.data());
-	ASSERT(mat_from_vector.rows() == 1 && mat_from_vector.cols() == v.length());
+		kd.knn_index(ptr_search, nnCount, idResults, radius);
 
-	std::cout << "Mat from vector:\n" << mat_from_vector << std::endl;
+		cv::draw_circle(img, ptr_search, 5, {255, 0, 0});
+		cv::draw_circle(img, ptr_search, radius, {255, 255, 0});
 
-	cv::vec3i vx = {1, 2, 3};
-	cv::matrixi mat_from_vectorx = vx;
+		for (auto id : idResults) {
+			cv::draw_circle(img, source[id], 5, {0, 255, 0});
+		}
 
-	std::cout << mat_from_vectorx.size() << std::endl;
+		cv::imshow("KD", img);
+		char key = cv::wait_key();
 
-	ASSERT(mat_from_vectorx.rows() == 1 && mat_from_vectorx.cols() == 3);
+		switch (key) {
+		case 'q':
+			return EXIT_SUCCESS;
+		case 'o':
+			radius += 10.0;
+			break;
 
-	std::cout << "Mat from vectorx:\n" << mat_from_vectorx << std::endl;
+		case 'p':
+			radius -= 10.0;
+			break;
+		case 'k':
+			nnCount += 1;
+			break;
+		case 'l':
+			nnCount -= 1;
+			break;
+		default:
+			ptr_search = { rand() % 600, rand() % 600 };
+			break;
+		}
+	}
 
 	return EXIT_SUCCESS;
 }
