@@ -10,6 +10,7 @@ At this early stage, libcv contains following:
 	* template matrix (m by n) designed for large matrices, that could hold images.
 	* image array structure abstraction with type defined in runtime, which essentially is an 3D array.
 * template bounded priority queue structure
+* basic k-d tree structure implementation with k-nearest neighbour search.
 * 2D contour, polygon and region structures
 * basic image manipulation algorithms.
 * basic linear algebra operations.
@@ -48,6 +49,10 @@ Also building blas and lapack should not be of any trouble on any *nix system.
 LibCV has been tested on Windows 8 with Visual Studio 2013. Instructions here will
 guide compilation using these tools, but for any older VC should not be much different.
 
+In **thirdParty** directory are built libs using Visual Studio 2013 (VC12) x64. If you need
+to compile it using some other toolchain, here are instructions I've followed to compile
+dependencies with vc12:
+
 ### Qt
 Download Qt 4.8.6 source here:
 http://download.qt.io/archive/qt/4.8/4.8.6/
@@ -59,16 +64,27 @@ Compilation steps:
 3. nmake
 4. nmake install
 
-*NOTE*
+#### NOTE
 The **-no-libpng** and **-no-libjpeg** flags are entered since specified versions of 
 png and jpeg libraries are used, Qt internals would not match, and image i/o
 would not work - png would compile ok, but runtime error would be thrown on 
 image loading, for jpeg I'm not sure, haven't test it.
 
+### Png 
+libpng 1.6 can be downloaded at sourceforge:
+[http://sourceforge.net/projects/libpng/files/](http://sourceforge.net/projects/libpng/files/)
+
+You'd need [zlib](http://www.zlib.net/) also. Both are easily compiled using CMake, 
+and with **vc12** should not be any trouble.
+
+### Jpeg
+I've skipped compiling jpeg on windows. There's some instructions on the web how to build
+it using nmake, but I've had no look. If anyone can help with that, please mail me, I'd be
+grateful.
+
 ### OpenBLAS
 Easiest way to get blas and lapacke is through OpenBlas. Here are some nice instructions
 on how to install it:
-
 [https://github.com/arrayfire/arrayfire/wiki/CBLAS-for-Windows](https://github.com/arrayfire/arrayfire/wiki/CBLAS-for-Windows)
 
 
