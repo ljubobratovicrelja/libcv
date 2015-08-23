@@ -49,7 +49,7 @@ Also building blas and lapack should not be of any trouble on any *nix system.
 LibCV has been tested on Windows 8 with Visual Studio 2013. Instructions here will
 guide compilation using these tools, but for any older VC should not be much different.
 
-In **thirdParty** directory are built libs using Visual Studio 2013 (VC12) x64. If you need
+**NOTE:** In **./thirdParty/ directory are built libs using Visual Studio 2013 (VC12) x64**. If you need
 to compile it using some other toolchain, here are instructions I've followed to compile
 dependencies with vc12:
 
@@ -64,7 +64,7 @@ Compilation steps:
 3. nmake
 4. nmake install
 
-*NOTE:* The **-no-libpng** and **-no-libjpeg** flags are entered since specified versions of 
+**NOTE:** The **-no-libpng** and **-no-libjpeg** flags are entered since specified versions of 
 png and jpeg libraries are used, Qt internals would not match, and image i/o
 would not work - png would compile ok, but runtime error would be thrown on 
 image loading, for jpeg I'm not sure, haven't test it.
