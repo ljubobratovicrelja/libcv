@@ -64,8 +64,7 @@ Compilation steps:
 3. nmake
 4. nmake install
 
-#### NOTE
-The **-no-libpng** and **-no-libjpeg** flags are entered since specified versions of 
+*NOTE:* The **-no-libpng** and **-no-libjpeg** flags are entered since specified versions of 
 png and jpeg libraries are used, Qt internals would not match, and image i/o
 would not work - png would compile ok, but runtime error would be thrown on 
 image loading, for jpeg I'm not sure, haven't test it.
@@ -79,7 +78,7 @@ and with **vc12** should not be any trouble.
 
 ### Jpeg
 I've skipped compiling jpeg on windows. There's some instructions on the web how to build
-it using nmake, but I've had no look. If anyone can help with that, please mail me, I'd be
+it using nmake, but I've had no luck. If anyone can help with that, please mail me, I'd be
 grateful.
 
 ### OpenBLAS
