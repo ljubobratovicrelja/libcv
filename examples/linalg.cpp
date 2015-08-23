@@ -34,7 +34,7 @@
 int main() {
 
 	// inverse matrix calculation.
-	cv::matrixr mat = {{32, 4, 5}, {1, 32, 4}, {31, 54, 54}};
+	cv::matrixr mat = {{32.f, 4.f, 5.f}, {1.f, 32.f, 4.f}, {31.f, 54.f, 54.f}};
 
 	auto inv = mat.clone();
 
@@ -47,7 +47,7 @@ int main() {
 	// lu decomposition 
 	cv::matrixr L, U, P;
 
-	mat = {{7, 3, -11}, {-6, 7, 10}, {-11, 2, -2}};
+	mat = {{7.f, 3.f, -11.f}, {-6.f, 7.f, 10.f}, {-11.f, 2.f, -2.f}};
 
 	cv::lu_decomp(mat, L, U, P);
 
@@ -65,38 +65,51 @@ int main() {
 	comp_res = (U*S*Vt);
 	ASSERT(std::memcmp((void*)mat.data(), (void*)comp_res.data(), 9*sizeof(real_t)));
 
-	// system solving : LU
+	/*
+	NOTE:
+	Even if the real_t is double, initializer list
+	has floats in it. On vc, narrowing down 
+	from double to float produces an error, but 
+	in gcc this is just a warning. 
 
+	So for the sake of compatibility, you should
+	always initialize real_t matrices with floats,
+	and if you need doubles, compile libcv with 
+	double as real - DOUBLE_REAL switch in CMake.
+	*/
+
+	// system solving : LU
 	cv::matrixr a = {
-		{6.80 , -6.05 , -0.45 ,  8.32 , -9.67},
-		{-2.11,  -3.30,   2.58,   2.71,  -5.14},
-		{5.66 ,  5.36 , -2.70 ,  4.35 , -7.26},
-		{5.97 , -4.44 ,  0.27 , -7.17 ,  6.08},
-		{8.23 ,  1.08 ,  9.04 ,  2.14 , -6.87}
+		{6.80f, -6.05f, -0.45f, 8.32f, -9.67f},
+		{-2.11f, -3.30f, 2.58f, 2.71f, -5.14f},
+		{5.66f, 5.36f, -2.70f, 4.35f, -7.26f},
+		{5.97f, -4.44f, 0.27f, -7.17f, 6.08f},
+		{8.23f, 1.08f, 9.04f, 2.14f, -6.87f}
 	};
 
 	cv::matrixr b = {
-		{4.02 , -1.56 ,  9.81},
-		{6.19 ,  4.00 , -4.09},
-		{-8.22,  -8.67,  -4.57},
-		{-7.57,   1.75,  -8.61},
-		{-3.03,   2.86,   8.99}
+		{4.02f , -1.56f,  9.81f},
+		{6.19f,  4.00f, -4.09f},
+		{-8.22f,  -8.67f,  -4.57f},
+		{-7.57f,   1.75f,  -8.61f},
+		{-3.03f,   2.86f,   8.99f}
 	};
 
 	cv::matrixr correct_solution = {
-		{-0.800714, -0.389621, 0.955465 },
-		{-0.695243, -0.554427, 0.22066 },
-		{0.593915 ,0.842227, 1.90064 },
-		{1.32173 ,-0.103802 ,5.35766 },
-		{0.565756 ,0.105711 ,4.0406 }
+		{-0.800714f, -0.389621f, 0.955465f },
+		{-0.695243f, -0.554427f, 0.22066f },
+		{0.593915f, 0.842227f, 1.90064f },
+		{1.32173f, -0.103802f, 5.35766f },
+		{0.565756f, 0.105711f, 4.0406f }
 	};
 
 	cv::matrixr x;
 
 	cv::lu_solve(a, b, x);
 
-	std::cout << correct_solution << std::endl;
-	std::cout << x << std::endl;
+	std::cout << "Correct solution:\n" << correct_solution << std::endl;
+	std::cout << "LU Solve calculated solution:\n" << x << std::endl;
+	std::cout << "Error: " << cv::distance(correct_solution, x) << std::endl;
 
 	return EXIT_SUCCESS;
 }
