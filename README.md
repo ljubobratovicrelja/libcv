@@ -98,7 +98,10 @@ make PREFIX=./package install
 Step 8., 9. and 10. can be skipped, since resulting lib file (libopenblas.dll.a) can be 
 successfully linked with VC.
 
-
+# Release Versions
+Version 0.1 is tagged because it was the version which [camera calibration](https://github.com/ljubobratovicrelja/camera_calibration)
+is developed with. But I can't guarantee the stability of library inside - it is only preserved because of the camera calibration project.
+ 
 # Contributions
 If anybody is interested to make a contrubution, you're welcome, and thank you! 
 Of course at this point, coding conventions or such rules are not firmly 
