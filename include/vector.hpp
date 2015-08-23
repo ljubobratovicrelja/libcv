@@ -811,7 +811,7 @@ real_t vector<_Tp>::distance(const vector<_Tp> &rhs, Norm n) const {
 	switch (n) {
 	case Norm::L1: {
 		for (unsigned i = 0; i < this->length(); ++i) {
-			d += std::fabs(this->at_index(i) - rhs[i]);
+			d += std::fabs(static_cast<double>(this->at_index(i) - rhs[i]));
 		}
 	}
 	break;
