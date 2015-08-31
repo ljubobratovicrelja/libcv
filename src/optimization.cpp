@@ -24,8 +24,7 @@
 // Relja Ljubobratovic, ljubobratovic.relja@gmail.com
 
 #include "../include/optimization.hpp"
-
-#include "../include/cminpack.h"
+#include "../include/cminpack.hpp"
 
 #include <limits>
 
