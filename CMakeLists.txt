@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 
 # Project variables
 set(OUT_LIB_NAME "cv")
-SET(CMAKE_DEBUG_POSTFIX "d")
+#SET(CMAKE_DEBUG_POSTFIX "d")
 
 # Configuration variables
 set(WITH_GUI TRUE CACHE BOOL "Compile GUI module of the libcv.")
@@ -58,10 +58,13 @@ link_directories(${ADDITIONAL_LIB_DIRECTORIES})
 
 if (NOT ${WITH_GUI})
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DCV_IGNORE_GUI")
+else(NOT ${WITH_GUI})
+	message("-- Compiling LibCV with GUI")
 endif(NOT ${WITH_GUI})
 
 if(${DOUBLE_REAL})
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DCV_DOUBLE_REAL")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DCV_REAL_TYPE_DOUBLE")
+	message("-- LibCV real type set to double.")
 endif(${DOUBLE_REAL})
 
 	
