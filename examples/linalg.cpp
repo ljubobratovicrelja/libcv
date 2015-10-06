@@ -60,7 +60,7 @@ int main() {
 	// svd decomposition 
 	cv::matrixr S, Vt;
 
-	cv::svd_decomp(mat, U, S, Vt);
+	cv::sv_decomp(mat, U, S, Vt);
 
 	comp_res = (U*S*Vt);
 	ASSERT(std::memcmp((void*)mat.data(), (void*)comp_res.data(), 9*sizeof(real_t)));
