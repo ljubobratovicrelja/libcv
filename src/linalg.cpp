@@ -96,7 +96,7 @@ size_t rank(const matrixr &matrix) {
 	size_t r = 0;
 
 	matrixr U, S, Vt;
-	svd_decomp(matrix, U, S, Vt);
+	sv_decomp(matrix, U, S, Vt);
 
 	float tol = std::max(matrix.rows(), matrix.cols()) * eps((real_t) * std::max_element(S.begin(), S.end()));
 
@@ -156,7 +156,7 @@ void lu_decomp(const matrixr &A, matrixr &L, matrixr &U, matrixr &P) {
 	P.transpose();
 }
 
-matrixr svd_decomp(const matrixr &A, matrixr &U, matrixr &S, matrixr &VT) {
+matrixr sv_decomp(const matrixr &A, matrixr &U, matrixr &S, matrixr &VT) {
 
 	ASSERT(A);
 
@@ -245,7 +245,7 @@ void null_solve(const matrixr &in, matrixr &nullSpace, bool normalize) {
 	ASSERT(in);
 
 	matrixr U, S, Vt;
-	svd_decomp(in, U, S, Vt);
+	sv_decomp(in, U, S, Vt);
 
 	if (!Vt) {
 		std::cerr <<("Invalid SVD factorization.");
@@ -420,7 +420,7 @@ int rodrigues_solve(const matrixr &src, matrixr &dst, matrixr *jacobian) {
 			return 0;
 		}
 
-		R = svd_decomp(R, U, W, V);
+		R = sv_decomp(R, U, W, V);
 		gemm(U, V, R);
 
 		rx = R.data_begin()[7] - R.data_begin()[5];

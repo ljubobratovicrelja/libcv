@@ -80,7 +80,7 @@ void CV_EXPORT lu_decomp(const matrixr &A, matrixr &L, matrixr &U,
  *
  * @returns Factorized matrix A.
  */
-matrixr CV_EXPORT svd_decomp(const matrixr &A, matrixr &U, matrixr &S,
+matrixr CV_EXPORT sv_decomp(const matrixr &A, matrixr &U, matrixr &S,
 		matrixr &VT);
 
 /*!
