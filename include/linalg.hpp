@@ -37,7 +37,7 @@
 
 
 #ifndef CV_AUTO_NORM_EIGENVECTORS
-#define CV_AUTO_NORM_EIGENVECTORS 0
+#define CV_AUTO_NORM_EIGENVECTORS 0 //!< Set to 0 to disable normalization in null space solving, and in eigenvector extraction. 
 #else
 #if (CV_AUTO_NORM_EIGENVECTORS != 1 && CV_AUTO_NORM_EIGENVECTORS != 0)
 #error "CV_AUTO_NORM_EIGENVECTORS has to be 1 or 0"
@@ -73,6 +73,25 @@ size_t CV_EXPORT rank(const matrixr &matrix);
  */
 void CV_EXPORT lu_decomp(const matrixr &A, matrixr &L, matrixr &U,
 		matrixr &P);
+
+/*!
+ * @brief Compute in place LU factorization of a general M-by-N matrix A using partial pivoting with row interchanges.
+ *
+ * Computes an LU	factorization of a general M-by-N matrix
+ * A using partial pivoting	with row interchanges. The factorization
+ * has the form :
+ * @code
+ A = P * L * U
+ @endcode
+ * where P is a permutation matrix, L is lower triangular with
+ * unit diagonal elements (lower trapezoidal if m > n), and U
+ * is upper	triangular (upper trapezoidal if m < n).
+ *
+ * @note
+ * This function resembles the lapack dgetrf/sgetrf function, and treats 
+ * the input matrix as the output, where P, L and U are contained.
+ */
+void CV_EXPORT lu_decomp(matrixr &A);
 
 /*!
  * @brief Compute singular	value decomposition (SVD) of a real M-by-N
