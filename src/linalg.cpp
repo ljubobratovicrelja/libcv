@@ -110,10 +110,10 @@ size_t rank(const matrixr &matrix) {
 
 void lu_decomp(const matrixr &A, matrixr &L, matrixr &U, matrixr &P) {
 
-	ASSERT(A && A.is_square());
+	ASSERT(A);
 
 	int rows = A.rows();
-	int cols = A.rows();
+	int cols = A.cols();
 	int lda = std::max(rows, cols);
 	int *piv = new int[rows];
 	int info;
@@ -154,6 +154,31 @@ void lu_decomp(const matrixr &A, matrixr &L, matrixr &U, matrixr &P) {
 	invert(LU);
 	P = A * LU;
 	P.transpose();
+}
+
+void lu_decomp(matrixr &A) {
+
+	ASSERT(A);
+
+	int rows = A.rows();
+	int cols = A.cols();
+	int lda = std::max(rows, cols);
+	int *piv = new int[rows];
+	int info;
+
+	info = cv_getrf(LAPACK_ROW_MAJOR, rows, cols, A.data(), lda, piv);
+
+	delete[] piv;
+
+	if (info > 0) {
+		std::cerr <<("Argument " + std::to_string(info) + ", has an illegal value.");
+	} else if (info < 0) {
+		std::cerr <<(
+				"matrix(" + std::to_string(info) + ", " + std::to_string(info)
+						+ ") is exactly zero. The factorization has " "been completed, but the factor"
+								" U is exactly singular, and division " "by zero will occur if it is used "
+								"to solve a system of equations.");
+	}
 }
 
 matrixr sv_decomp(const matrixr &A, matrixr &U, matrixr &S, matrixr &VT) {
