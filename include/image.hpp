@@ -1,24 +1,24 @@
-//The MIT License (MIT)
-//
-//Copyright (c) 2015 Relja Ljubobratovic, ljubobratovic.relja@gmail.com
-//
-//Permission is hereby granted, free of charge, to any person obtaining a copy
-//of this software and associated documentation files (the "Software"), to deal
-//in the Software without restriction, including without limitation the rights
-//to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//copies of the Software, and to permit persons to whom the Software is
-//furnished to do so, subject to the following conditions:
-//
-//The above copyright notice and this permission notice shall be included in
-//all copies or substantial portions of the Software.
-//
-//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-//THE SOFTWARE.
+// The MIT License (MIT)
+// 
+// Copyright (c) 2015 Relja Ljubobratovic, ljubobratovic.relja@gmail.com
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 //
 // Description:
 // Contains array structure specified to represent an image byte array. It's interface 
@@ -32,6 +32,7 @@
 #ifndef IMAGE_HPP_7D0HB8PC
 #define IMAGE_HPP_7D0HB8PC
 
+#include <limits>
 
 #include "array.hpp"
 #include "matrix.hpp"
@@ -522,6 +523,19 @@ bool image_array::is_type() const {
     default:
         return false;
     }
+}
+
+template<typename _Tp, typename _Tc>
+_Tp range_cast(_Tc value) {
+
+	double value_d = static_cast<double>(value);
+
+	if (value_d < std::numeric_limits<_Tp>::min())
+		return static_cast<_Tp>(std::numeric_limits<_Tp>::min());
+	if (value_d > std::numeric_limits<_Tp>::max())
+		return static_cast<_Tp>(std::numeric_limits<_Tp>::max());
+
+	return static_cast<_Tp>(value_d);
 }
 
 }
