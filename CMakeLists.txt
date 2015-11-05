@@ -14,7 +14,6 @@ set(COMPILE_EXAMPLES TRUE CACHE BOOL "Should the examples be compiled.")
 file(GLOB SRC_FILES "./src/*.c*")
 file(GLOB INC_FILES "./include/*.h*")
 
-
 if (WIN32)
 	set(CMAKE_CXX_FLAGS "/openmp /EHsc /W3")
 	set(CMAKE_CXX_FLAGS_DEBUG "/DEBUG")
@@ -43,6 +42,7 @@ elseif(NOT WIN32 AND UNIX)
 	set(LAPACK_LIB "lapack" CACHE FILEPATH "Path to the lapack library file")
 	set(LAPACKE_LIB "lapacke" CACHE FILEPATH "Path to the lapacke library file")
 	set(BLAS_LIB "blas" CACHE FILEPATH "Path to the blas library file")
+	set(CBLAS_LIB "blas" CACHE FILEPATH "Path to the cblas library file")
 endif(WIN32)
 
 if (CMAKE_BUILD_TYPE MATCHES Debug OR CMAKE_BUILD_TYPE MATCHES DEBUG)
@@ -71,8 +71,11 @@ endif(${DOUBLE_REAL})
 add_library(${OUT_LIB_NAME} SHARED ${SRC_FILES})
 	
 target_link_libraries(${OUT_LIB_NAME} ${PNG_LIB})
-target_link_libraries(${OUT_LIB_NAME} Qt4::QtGui)
-target_link_libraries(${OUT_LIB_NAME} Qt4::QtCore)
+
+if (${WITH_GUI})
+	target_link_libraries(${OUT_LIB_NAME} Qt4::QtGui)
+	target_link_libraries(${OUT_LIB_NAME} Qt4::QtCore)
+endif(${WITH_GUI})
 
 if (WIN32)
 	target_link_libraries(${OUT_LIB_NAME} "imm32.lib")
@@ -83,6 +86,7 @@ else (WIN32)
 	target_link_libraries(${OUT_LIB_NAME} ${LAPACK_LIB})
 	target_link_libraries(${OUT_LIB_NAME} ${LAPACKE_LIB})
 	target_link_libraries(${OUT_LIB_NAME} ${BLAS_LIB})
+	target_link_libraries(${OUT_LIB_NAME} ${CBLAS_LIB})
 endif(WIN32)
 
 if (${WITH_JPEG})
