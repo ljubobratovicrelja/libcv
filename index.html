@@ -1,0 +1,195 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Libcv by ljubobratovicrelja</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <meta name="viewport" content="width=device-width">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Libcv</h1>
+        <p>Library for basic computer vision tasks.</p>
+
+        <p class="view"><a href="https://github.com/ljubobratovicrelja/libcv">View the Project on GitHub <small>ljubobratovicrelja/libcv</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/ljubobratovicrelja/libcv/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/ljubobratovicrelja/libcv/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/ljubobratovicrelja/libcv">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a id="libcv" class="anchor" href="#libcv" aria-hidden="true"><span class="octicon octicon-link"></span></a>LibCV</h1>
+
+<p>Small library containing data structures and algorithms for most basic computer vision tasks, 
+developed as learning project and coding practice, to be used for my faculty projects.</p>
+
+<h2>
+<a id="contents" class="anchor" href="#contents" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contents</h2>
+
+<p>At this early stage, libcv contains following:</p>
+
+<ul>
+<li>Array structures - with reference counted data, and slicing operators.
+
+<ul>
+<li>template vector (with heap data), and vectorx (with statically defined size).</li>
+<li>template matrix (m by n) designed for large matrices, that could hold images.</li>
+<li>image array structure abstraction with type defined in runtime, which essentially is an 3D array.</li>
+</ul>
+</li>
+<li>template bounded priority queue structure</li>
+<li>basic k-d tree structure implementation with k-nearest neighbour search.</li>
+<li>2D contour, polygon and region structures</li>
+<li>basic image manipulation algorithms.</li>
+<li>basic linear algebra operations.</li>
+<li>lmdif integration from cminpack.</li>
+<li>image i/o</li>
+<li>basic gui support for showing images</li>
+</ul>
+
+<h2>
+<a id="dependencies" class="anchor" href="#dependencies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dependencies</h2>
+
+<p>Libcv depends on following libraries:</p>
+
+<ul>
+<li>Qt4 (4.8.6)</li>
+<li>libpng (libpng16)</li>
+<li>libjpg (jpegsr8)</li>
+<li>lapacke</li>
+<li>blas</li>
+</ul>
+
+<h2>
+<a id="documentation" class="anchor" href="#documentation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Documentation</h2>
+
+<p>Proper documentation is not available, and it will not be if there is no interest
+from other people to use this library. I'll try to document code in doxygen style,
+so if anyone is up to it, he can build doc files himself.</p>
+
+<h2>
+<a id="compilation" class="anchor" href="#compilation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Compilation</h2>
+
+<p>LibCV is mainly developed on Ubuntu with gcc 4.9.2. Ubuntu 15.04 has all needed libraries (and
+corresponding versions) on it's repositories, which can be installed using apt-get.</p>
+
+<p>It was not tested on other *nix systems, but as long as your able to use gcc
+with c++11 support, you could easily download, build and link needed libraries.
+Also building blas and lapack should not be of any trouble on any *nix system.</p>
+
+<h3>
+<a id="custom-cmake-build-flags" class="anchor" href="#custom-cmake-build-flags" aria-hidden="true"><span class="octicon octicon-link"></span></a>Custom CMake build flags</h3>
+
+<ul>
+<li>
+<strong>WITH_GUI</strong> - if FALSE, ignores gui module, and doesn't link Qt</li>
+<li>
+<strong>WITH_JPEG</strong> - turn on jpeg i/o support. If FALSE, does not link libjpeg.</li>
+<li>
+<strong>DOUBLE_REAL</strong> - if TRUE, real type in LibCV is double, if FALSE it is of single precision.</li>
+<li>
+<strong>COMPILE_EXAMPLES</strong> - compile example programs in ./examples/ directory. </li>
+</ul>
+
+<h2>
+<a id="compilation-on-windows" class="anchor" href="#compilation-on-windows" aria-hidden="true"><span class="octicon octicon-link"></span></a>Compilation on Windows</h2>
+
+<p>LibCV has been tested on Windows 8 with Visual Studio 2013. Instructions here will
+guide compilation using these tools, but for any older VC should not be much different.</p>
+
+<p><strong>NOTE:</strong> In <strong>./thirdParty/ directory are built libs using Visual Studio 2013 (VC12) x64</strong>. If you need
+to compile it using some other toolchain, here are instructions I've followed to compile
+dependencies with vc12:</p>
+
+<h3>
+<a id="qt" class="anchor" href="#qt" aria-hidden="true"><span class="octicon octicon-link"></span></a>Qt</h3>
+
+<p>Download Qt 4.8.6 source here:
+<a href="http://download.qt.io/archive/qt/4.8/4.8.6/">http://download.qt.io/archive/qt/4.8/4.8.6/</a></p>
+
+<p>Compilation steps:</p>
+
+<ol>
+<li>Open VS Command line</li>
+<li>configure -release -opensource -no-libpng -no-libjpeg</li>
+<li>nmake</li>
+<li>nmake install</li>
+</ol>
+
+<p><strong>NOTE:</strong> The <strong>-no-libpng</strong> and <strong>-no-libjpeg</strong> flags are entered since specified versions of 
+png and jpeg libraries are used, Qt internals would not match, and image i/o
+would not work - png would compile ok, but runtime error would be thrown on 
+image loading, for jpeg I'm not sure, haven't test it.</p>
+
+<h3>
+<a id="png" class="anchor" href="#png" aria-hidden="true"><span class="octicon octicon-link"></span></a>Png</h3>
+
+<p>libpng 1.6 can be downloaded at sourceforge:
+<a href="http://sourceforge.net/projects/libpng/files/">http://sourceforge.net/projects/libpng/files/</a></p>
+
+<p>You'd need <a href="http://www.zlib.net/">zlib</a> also. Both are easily compiled using CMake, 
+and with <strong>vc12</strong> should not be any trouble.</p>
+
+<h3>
+<a id="jpeg" class="anchor" href="#jpeg" aria-hidden="true"><span class="octicon octicon-link"></span></a>Jpeg</h3>
+
+<p>I've skipped compiling jpeg on windows. There's some instructions on the web how to build
+it using nmake, but I've had no luck. If anyone can help with that, please mail me, I'd be
+grateful.</p>
+
+<h3>
+<a id="openblas" class="anchor" href="#openblas" aria-hidden="true"><span class="octicon octicon-link"></span></a>OpenBLAS</h3>
+
+<p>Easiest way to get blas and lapacke is through OpenBlas. Here are some nice instructions
+on how to install it:
+<a href="https://github.com/arrayfire/arrayfire/wiki/CBLAS-for-Windows">https://github.com/arrayfire/arrayfire/wiki/CBLAS-for-Windows</a></p>
+
+<p>As guide suggests, you'd need cygwin with x86_64-w64-mingw32-gcc and x86_64-w64-mingw32-gfortran,
+and with cygwin terminal, compilation is easy - just make, and make install:</p>
+
+<pre><code>make BINARY=64 CC=/usr/bin/x86_64-w64-mingw32-gcc-4.8.3.exe FC=/usr/bin/x86_64-w64-mingw32-gfortran.exe
+make PREFIX=./package install
+</code></pre>
+
+<p>Step 8., 9. and 10. can be skipped, since resulting lib file (libopenblas.dll.a) can be 
+successfully linked with VC.</p>
+
+<h1>
+<a id="release-versions" class="anchor" href="#release-versions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Release Versions</h1>
+
+<p>Version 0.1 is tagged because it was the version which <a href="https://github.com/ljubobratovicrelja/camera_calibration">camera calibration</a>
+is developed with. But I can't guarantee the stability of library inside - it is only preserved because of the camera calibration project.</p>
+
+<h1>
+<a id="contributions" class="anchor" href="#contributions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contributions</h1>
+
+<p>If anybody is interested to make a contrubution, you're welcome, and thank you! 
+Of course at this point, coding conventions or such rules are not firmly 
+established - as long as you're willing to contribute, just make a pull request, 
+and we'll work it out...</p>
+
+<h1>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>LICENSE</h1>
+
+<p>Library is under MIT license. See LICENSE file for details.</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/ljubobratovicrelja">ljubobratovicrelja</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
