@@ -4,7 +4,7 @@ Small library containing data structures and algorithms for most basic computer 
 developed as learning project and coding practice, to be used for my faculty projects.
 
 ## Contents
-At this early stage, libcv contains following:
+libcv contains following:
 * Array structures - with reference counted data, and slicing operators.
 	* template vector (with heap data), and vectorx (with statically defined size).
 	* template matrix (m by n) designed for large matrices, that could hold images.
