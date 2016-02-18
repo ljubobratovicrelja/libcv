@@ -32,7 +32,7 @@ from other people to use this library. I'll try to document code in doxygen styl
 so if anyone is up to it, he can build doc files himself.
 
 ## Compilation
-LibCV is mainly developed on Ubuntu with gcc 4.9.2. Ubuntu 15.04 has all needed libraries (and
+LibCV was mainly developed on Ubuntu with gcc 4.9.2. Ubuntu 15.04 has all needed libraries (and
 corresponding versions) on it's repositories, which can be installed using apt-get.
 
 It was not tested on other *nix systems, but as long as your able to use gcc
